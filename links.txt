@@ -3,3 +3,5 @@ https://github.com/mhagger/git-multimail
 https://www.kernel.org/
 http://www.troubleshooters.com/linux/prepostpath.htm
 https://www.movealong.org/hostname.html
+git@github.com:zhaoxifeng/git_links.git
+http://www.brennan.id.au/index.html
