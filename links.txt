@@ -9,3 +9,4 @@ http://www.brennan.id.au/index.html
 https://www.samba.org
 http://content.websitegear.com/article/domain_setup.htm
 http://blog.csdn.net/marcolu/article/details/31925
+http://bind10.isc.org/docs/bind10-guide.html
