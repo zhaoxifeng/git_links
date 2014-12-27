@@ -1,0 +1,2 @@
+edit authorization for audio
+auth the user for audio
