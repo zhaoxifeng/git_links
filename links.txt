@@ -6,4 +6,4 @@ https://www.movealong.org/hostname.html
 http://computernetworkingnotes.com/network-administrations/sendmail-server.html
 git@github.com:zhaoxifeng/git_links.git
 http://www.brennan.id.au/index.html
-
+https://www.samba.org
