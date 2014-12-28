@@ -11,3 +11,4 @@ http://content.websitegear.com/article/domain_setup.htm
 http://blog.csdn.net/marcolu/article/details/31925
 http://bind10.isc.org/docs/bind10-guide.html
 https://ripe68.ripe.net/presentations/208-The_Decline_and_Fall_of_BIND_10.pdf
+http://it-ebooks.info/book/899/
