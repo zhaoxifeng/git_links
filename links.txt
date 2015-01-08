@@ -15,3 +15,4 @@ http://it-ebooks.info/book/899/
 http://www.linux-magazine.com/Issues/2013/152/Bind-10-Test-Drive
 http://www.zonefile.org/
 http://www.tokiwinter.com/bind-10-first-steps/
+http://yuanbin.blog.51cto.com/363003/110825
