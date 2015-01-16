@@ -1,0 +1,12 @@
+add customized git diff tool
+
+[diff]
+	tool = bc3
+[difftool "bc3"]
+	path = C:\\Program Files (x86)\\Beyond Compare 3\\BComp.exe
+[difftool]
+	prompt = false
+	
+
+then call command
+git difftool instead of git diff
