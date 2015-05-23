@@ -1,0 +1,4313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Network Time Protocol</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="08-Domain_Name_System_BIND.html">Previous</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="10-DHCP_Server.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 9 - Network Time
+Protocol<br>
+
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+
+
+      <td>- ntpd 4.2.0</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+<a href="#initial"><span style="color: rgb(255, 0, 0); font-weight: bold;"></span><span style="font-weight: bold;"></span>Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<a href="#starting">Starting
+the Server</a><br>
+
+
+
+
+
+
+
+<a href="#clients">Client
+Configuration</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The Network Time Protocol is defined in <a href="http://www.ietf.org/rfc/rfc1305.txt">RFC1305</a>
+and allows the transfer and maintenance of time functions over
+distributed network systems. One of the most widely used NTP servers is
+ntpd (<a href="http://ntp.isc.org">ntp.isc.org</a>),
+which also provides Simple NTP (<a href="http://www.ietf.org/rfc/rfc2030.txt">RFC2030</a>)
+and is a common package of most Linux distributions. The NTP server
+figures out how much the system clock drifts and smoothly corrects it
+with delicate accuracy, as opposed to large adjustments once
+every few hours.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following chapter details how to configure the local NTP daemon
+to access external time servers and to provide the clients on the
+internal network the ability to synchronise from the server.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="initial"></a><a href="#top">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+Just like any time piece, the NTP server maintains a time service where
+the synchronisation and maintenance of time is paramount. Before any
+time services are configured, its important that the server should have
+an initial state which has been synchronised with another time source
+reference. The following command will synchronise the local system time
+against another server, ensuring nearest possible time is available
+before
+configuring the NTP server.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ntpdate
+-b pool.ntp.org</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Before we adjust any configuration files, its always recommended that
+we make a backup of the original in case things go wrong, then we can
+edit the file and make changes as required.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp /etc/ntp.conf
+/etc/ntp.conf.original</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/ntp.conf</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h3>Finding a Time Source</h3>
+
+
+
+
+
+
+
+One of the most difficult issues that people face with NTP is finding a
+time server that allows home and small office users to publicly
+synchronise off them. Enter the NTP Pooling Project located at <a href="http://www.pool.ntp.org">http://www.pool.ntp.org</a>.
+The NTP Pool is a collection of over 220 publicly accessible NTP
+servers distributed throughout different regions of the world. The DNS
+records for the NTP Pool are rotated hourly with different servers
+being allocated into each pool and region.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The advantages of the NTP Pool are:<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li>that all the available
+servers will load balance,</li>
+
+
+
+
+
+
+
+  <li>you don't need to spend
+hours hunting for any public servers, and</li>
+
+
+
+
+
+
+
+  <li>you only need to remember
+one set of records for all the servers.</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+The default configuration for ntpd servers after version 4.2 uses the
+NTP Pool for the default server sources.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>server 0.pool.ntp.org<br>
+
+
+
+
+
+
+
+server 1.pool.ntp.org<br>
+
+
+
+
+
+
+
+server 2.pool.ntp.org<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+If you have access to other NTP servers which are geographically closer
+and you can synchronise from them, you should substitute the server
+values above. Alternately the NTP Pools are also broken into
+geographical Pools which may serve as a quicker time source, see here:
+<a href="http://ntp.isc.org/bin/view/Servers/NTPPoolServers">http://ntp.isc.org/bin/view/Servers/NTPPoolServers</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h3>Access Controls</h3>
+
+
+
+
+
+
+
+The NTP server is a network application that provides a resource to
+other networked systems and clients, as such we need to ensure that
+some security measures are enforced. The NTP configuration has
+adjustable access controls that define all the default controls and
+those for allowable clients and remote servers.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following <span style="font-family: monospace;">restrict</span>
+statement defines the suggested access controls
+for all default connections.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>restrict default kod
+nomodify notrap noquery nopeer </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following table lists and defines some of the more commonly used
+access control parameters.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 140px;">Parameters<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Definitions<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">ignore<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny all packets and
+queries<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">kod<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Send Kiss-Of-Death
+packet on access violation<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">nomodify<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny ntpq / ntpdc
+queries that attempt to modify the server<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">notrap<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny control message
+trap service<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">noquery<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny all ntpq / ntpdc
+queries<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">noserve</td>
+
+
+
+
+
+
+
+      <td>Deny all queries -
+except ntpq / ntpdc</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">notrust<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny access unless
+cryptographically authenticated (ver 4.2 onwards)<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 140px;">nopeer<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Deny all packets that
+attempt to establish a peer association<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+      <td>In NTP versions prior to
+4.2, the <span style="font-family: monospace;">notrust</span>
+option meant not to trust a server/host for time. In NTP versions 4.2
+and
+later, the <span style="font-family: monospace;">notrust</span>
+option means cryptographic authentication is required before believing
+the server/host. Unless using cryptography, do not use the <span style="font-family: monospace;">notrust</span>
+option, your client requests will fail. </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To allow full control to the localhost, add the following entry to the
+configuration.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>restrict 127.0.0.1<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The NTP Pool servers have been listed as a time source already (ver 4.2
+onwards), and
+they too need restrictions applied so the local server can synchronise
+from them. Ensure the access control parameters are strict enough that
+the remote servers can only be used for queries.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>restrict 0.pool.ntp.org
+mask 255.255.255.255 nomodify notrap noquery<br>
+
+
+
+
+
+
+
+restrict 1.pool.ntp.org mask 255.255.255.255 nomodify notrap
+noquery<br>
+
+
+
+
+
+
+
+restrict 2.pool.ntp.org mask 255.255.255.255 nomodify notrap
+noquery<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To allow all the workstations inside the internal private network to
+be able to query the time from your server, use the following access
+control rule
+(adjust subnet if needed).<br>
+
+
+
+
+
+
+
+<span style="font-family: monospace;"></span><br>
+<span style="font-family: monospace;">
+
+
+
+
+
+
+</span>
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>restrict 192.168.1.0
+mask 255.255.255.0 nomodify notrap<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Finally we need the following declarations in the <span style="font-family: monospace;">/etc/ntp.conf</span>
+file.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+127.127.1.0&nbsp;&nbsp;&nbsp;&nbsp; # local clock<br>
+
+
+
+
+
+
+
+fudge&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+127.127.1.0 stratum 10<br>
+
+
+
+
+
+
+
+driftfile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/var/lib/ntp/drift<br>
+
+
+
+
+
+
+
+broadcastdelay&nbsp; 0.008<br>
+
+
+
+
+
+
+
+keys&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/etc/ntp/keys<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The above configuration parameters are as follows:<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">server<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Specifies that a server
+is running on the host (own local
+clock)<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">fudge<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Passes additional
+information to the clock driver<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">stratum
+10<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Manually sets the
+Stratum the server should operate at (1-15)<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">driftfile<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Specifies the location
+of the frequency file<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">broadcastdelay<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Sets the propagation
+delay from the server when broadcasting<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">keys<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td>Store a list of keys
+needed for any cryptographic links<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h3>The Strata</h3>
+
+
+
+
+
+
+
+The world of NTP is hierarchical with the primary servers at the top
+keeping the master time, and distributing the time down to the
+secondary servers and so forth until your little workstation
+synchronises in
+the corner office. Each server participating in the hierarchy are
+allocated a stratum, with stratum 1 being the master servers, stratum 2
+the secondary servers, down to the lower end of stratum 15. A stratum 1
+server uses an external time source (GPS, etc..) which is introduced
+into the server and then used to propagate the time signals. Stratum 2
+servers draw their time from the higher (1) stratum servers.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+When determining the stratum of your server, firstly consider who you
+are providing time to? If you are only using the system for yourself
+and passing it on to a few workstations, then your stratum can be
+safely left at 10. If you are using the system for a large scale
+network, then plan your time servers and strata effectively.<br>
+
+
+
+
+
+
+
+<h2><a name="starting"></a><a href="#top">Starting NTP</a><br>
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+The server is now fully configured and ready to start. If you have not
+already done an initial synchronisation of time (before running the
+daemon), you should do so now. The initial sync only needs to be done
+once
+before the server is started for the first time, not each time it
+starts.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ntpdate
+-b pool.ntp.org</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+You should now set the runlevels required for the ntpd service, then
+restart it.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 2345 ntpd on</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">/etc/init.d/ntpd restart</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>The NTP server uses UDP
+packets to query time servers on port 123.
+Depending on your Linux configuration, the initscripts for the ntpd
+service may have iptables commands to
+allow ntpd to access the external time servers.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+You can check which runlevels the service will be active with the
+following command.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig --list
+ntpd</span> </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To see if the service started successfully, you should check the system
+log file.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">grep ntpd
+/var/log/messages</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>galaxy ntpd[1110]: ntpd 4.2.0a@1.1196-r Thu Feb 23 04:42:00 EST 2006 (1)<br>
+
+
+
+
+
+galaxy ntpd[1110]: precision = 2.000 usec<br>
+
+
+
+
+
+galaxy ntpd[1110]: Listening on interface wildcard, 0.0.0.0#123<br>
+
+
+
+
+
+galaxy ntpd[1110]: Listening on interface wildcard, ::#123<br>
+
+
+
+
+
+galaxy ntpd[1110]: Listening on interface lo, 127.0.0.1#123<br>
+
+
+
+
+
+galaxy ntpd[1110]: Listening on interface eth0, 192.168.1.1#123<br>
+
+
+
+
+
+galaxy ntpd[1110]: kernel time sync status 0040<br>
+
+
+
+
+
+galaxy ntpd[1110]: frequency initialized 0.000 PPM from /var/lib/ntp/drift<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+You can now query the NTP server with the <span style="font-family: monospace;">ntpq</span>
+(query) tool. The output
+display after <span style="font-family: monospace;">ntpd</span>
+has
+been (re)started will be similar to the first table. As ntpd is allowed
+to run for a while, the table will start to fill with synchronisation
+details.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ntpq -pn</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;
+remote&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+refid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; st t when poll
+reach&nbsp;&nbsp;
+delay&nbsp;&nbsp; offset&nbsp; jitter<br>
+
+
+
+
+
+
+
+==============================================================================<br>
+
+
+
+
+
+
+
+&nbsp;80.26.104.184&nbsp;&nbsp;
+.INIT.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+16 u&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;
+64&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp;&nbsp; 0.000 4000.00<br>
+
+
+
+
+
+
+
+&nbsp;128.95.231.7&nbsp;&nbsp;&nbsp;
+.INIT.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+16 u&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;
+64&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp;&nbsp; 0.000 4000.00<br>
+
+
+
+
+
+
+
+&nbsp;64.112.189.11&nbsp;&nbsp;
+.INIT.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+16 u&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;
+64&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp;&nbsp; 0.000 4000.00<br>
+
+
+
+
+
+
+
+&nbsp;127.127.1.0&nbsp;&nbsp;&nbsp;&nbsp;
+LOCAL(0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+10 l&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;
+64&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp;&nbsp; 0.000 4000.00<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;
+remote&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+refid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; st t when poll
+reach&nbsp;&nbsp;
+delay&nbsp;&nbsp; offset&nbsp; jitter<br>
+
+
+
+
+
+
+
+==============================================================================<br>
+
+
+
+
+
+
+
+*80.26.104.184&nbsp;&nbsp;
+217.127.32.90&nbsp;&nbsp;&nbsp; 2
+u&nbsp;&nbsp; 66&nbsp; 256&nbsp; 377&nbsp;
+470.247&nbsp;&nbsp;
+32.058&nbsp; 33.497<br>
+
+
+
+
+
+
+
++128.95.231.7&nbsp;&nbsp;&nbsp;
+140.142.2.8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3
+u&nbsp; 254&nbsp; 256&nbsp;
+377&nbsp; 217.646&nbsp;&nbsp; -3.832&nbsp;&nbsp;
+2.734<br>
+
+
+
+
+
+
+
++64.112.189.11&nbsp;&nbsp;
+128.10.252.6&nbsp;&nbsp;&nbsp;&nbsp; 2
+u&nbsp;&nbsp;&nbsp; 2&nbsp; 256&nbsp; 377&nbsp;
+258.208&nbsp;&nbsp;&nbsp; 2.395&nbsp; 47.246<br>
+
+
+
+
+
+
+
+&nbsp;127.127.1.0&nbsp;&nbsp;&nbsp;&nbsp;
+LOCAL(0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+10 l&nbsp;&nbsp;
+56&nbsp;&nbsp; 64&nbsp; 377&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp;&nbsp;
+0.000&nbsp;&nbsp; 0.002<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The above output shows a properly synchronised time server drawing from
+NTP Pool allocated sources. You will notice our server is running at a
+stratum of
+10.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>Your internal
+workstation computers will not be able to use
+the server as a synchronisation source until the <span style="font-family: monospace;">LOCAL(0)</span>
+clock has stable time.
+This may take up to 15 minutes after starting the NTP daemon. </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span><br>
+<span style="text-decoration: underline;"><span style="font-weight: bold;">
+
+
+
+
+
+
+</span></span>The
+server can be tested from another Linux workstation
+by issuing the following synchronisation command.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ntpdate
+192.168.1.1</span> </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+If the client computer
+does not get the time from the server, check that the server and client
+have access through any firewall settings.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="clients"></a><a href="#top">Client
+Configuration</a></h2>
+
+
+
+
+
+
+
+Before any client can successfully synchronise with the NTP server, the
+server's time must be stable. It may take a server up to 15 minutes
+before it can be used as a time source, after ntpd has been (re)started.<br>
+
+
+
+
+
+
+
+<h3>Linux Client</h3>
+
+
+
+
+
+
+
+To configure a Linux client to use the new server as a time source, the
+configuration file for the client should at least contain the following
+entries.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;"></span>[bash]# <span style="font-weight: bold;">vi /etc/ntp.conf</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  <tr>
+
+
+
+
+      <td>server 192.168.1.1<br>
+
+
+
+
+
+
+
+restrict default ignore<br>
+
+
+
+
+
+
+
+restrict 127.0.0.1<br>
+
+
+
+
+
+
+
+restrict 192.168.1.1
+mask 255.255.255.255 nomodify notrap noquery<br>
+
+
+
+
+
+
+
+driftfile /var/lib/ntp/drift</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+The Linux client will also need to have the ntpd service started.<br>
+
+
+
+
+
+
+
+<h3>Microsoft Client</h3>
+
+
+
+
+
+
+
+To configure a Microsoft Windows (XP) client, follow the sequence of
+commands below.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>These commands are
+tested on Windows XP, and may not be
+specific to every version of Windows. <br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span><br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net time
+/setsntp:192.168.1.1</span><br>
+
+
+
+
+
+
+
+The command completed successfully.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net time
+/querysntp</span><br>
+
+
+
+
+
+
+
+The current SNTP value is: 192.168.1.1<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+The command completed successfully.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net stop
+w32time &amp;&amp; net start
+w32time</span><br>
+
+
+
+
+
+
+
+The Windows Time service is stopping.<br>
+
+
+
+
+
+
+
+The Windows Time service was stopped successfully.<br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+The Windows Time service is starting.<br>
+
+
+
+
+
+
+
+The Windows Time service was started successfully. <br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The standard time query interval for Windows (XP) is one query every 7
+days,
+which for time critical applications and environments is ineffective.
+To
+adjust the time interval for Windows (XP), a registry value needs to be
+adjusted.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Windows (XP) stores the following registry key in a hexadecimal format,
+which converted to decimal will amount to the time in seconds between
+time queries. Select the new time (in seconds) that you require the
+Windows (XP) system to poll the server, then convert it to hexadecimal
+(86400
+seconds is 1 day). This should be the "DWORD" value.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!" src="images/warning.gif"></td>
+
+
+
+
+
+
+
+      <td>Adjusting the Windows
+registry may cause your computer system
+to become unstable, do so at your own risk.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span><br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\w32time\TimeProviders\NtpClient]<br>
+
+
+
+
+
+
+
+"SpecialPollInterval"=dword:00093a80<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The "Windows Time" service in Windows (XP) should be set to start
+automatically on each system boot. The event log should be viewed for
+any
+errors that may occur. See this article for more information:&nbsp;<a href="http://support.microsoft.com/kb/323621">http://support.microsoft.com/kb/323621</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>If the service does not
+appear to be synchronising with the
+Linux server, ensure that the firewall is allowing any required
+connections.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="08-Domain_Name_System_BIND.html">Previous</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="10-DHCP_Server.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+</body>
+</html>

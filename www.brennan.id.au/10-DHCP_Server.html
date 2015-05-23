@@ -1,0 +1,4256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - DHCP Server</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="09-Network_Time_Protocol.html">Previous</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="11-Squid_Web_Proxy.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 10 - DHCP Server</h1>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+
+
+
+      <td>- dhcpd 3.0.3</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<a href="#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+
+<a href="#setfixed">Setting
+Fixed Addresses</a><br>
+
+
+
+
+
+
+
+
+<a href="#options">Setting
+Daemon Options</a><br>
+
+
+
+
+
+
+
+
+<a href="#starting">Starting
+DHCP</a><br>
+
+
+
+
+
+
+
+
+<a href="#testing">Testing
+The Server</a><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Dynamic Host Configuration Protocol (DHCP) is defined in <a href="http://www.ietf.org/rfc/rfc2131.txt">RFC2131</a>
+and is
+basically an automated
+means of managing and assigning Internet IP addresses to client
+workstations on the network. This protocol saves the system
+administrator much time having to manually configure each host
+workstation manually, and to maintain large databases storing IP
+assignment details. When any of the network settings change (like
+allocating a new default gateway or new DNS server), then the details
+can be configured at the DHCP server as opposed to manually changing
+the settings of many client systems.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+This chapter will provide the means to configure the DHCPd package to
+provide IP assignment to your internal network. The DHCP server is
+installed on most Linux distributions, and is also
+available from the <a href="http://www.isc.org/">Internet
+Systems
+Consortium</a> site.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="config"></a><a href="#top">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+The main DHCP configuration file should be located at <span style="font-family: monospace;">/etc/dhcpd.conf</span>,
+however it is
+sometimes missing. This is a configuration safeguard to stop users
+from accidentally starting a DHCP server without fully configuring its
+details. Having any unplanned DHCP servers operating on a network can
+result in major network problems. Therefore the administrator must
+create the configuration before implementing its services, a physical
+task to reduce error (some distributions may have the file available).<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/dhcpd.conf</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The following configuration file is an example for a typical home /
+small office network.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Be sure to change
+parameters to suit your network and domain
+name.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>#<br>
+
+
+
+
+
+
+
+
+#&nbsp;&nbsp; DHCP Server Config File<br>
+
+
+
+
+
+
+
+
+#<br>
+
+
+
+
+
+
+
+
+ddns-update-style none;<br>
+
+
+
+
+
+
+
+
+ignore client-updates;<br>
+
+      <br>
+
+
+
+
+
+
+
+
+lease-file-name "/var/lib/dhcpd/dhcpd.leases";<br>
+
+
+
+
+
+
+
+
+authoritative;<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+option
+domain-name &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+&nbsp;&nbsp;
+"example.com";<br>
+default-lease-time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+86400;&nbsp;&nbsp; # 24 hours<br>
+
+
+
+
+
+
+
+
+max-lease-time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+172800;&nbsp; # 48 hours<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+subnet 192.168.1.0 netmask 255.255.255.0 {<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option
+routers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.1;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option
+subnet-mask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+255.255.255.0;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option
+broadcast-address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.255;<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; option
+domain-name-servers
+&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.1;<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option ntp-servers &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;&nbsp;
+192.168.1.1;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option
+netbios-name-servers&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.1;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+option
+netbios-node-type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+8;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+range&nbsp;&nbsp;
+192.168.1.101&nbsp;&nbsp; 192.168.1.200;<br>
+
+
+
+
+
+
+
+
+}<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+A DHCP server can be configured with more than one range (subnet) of IP
+addresses. The parameters specified above the "subnet" declaration are
+global parameters which are applied to all subnet declarations, while
+the parameters inside each subnet override the global parameters.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The parameters specified in the above sample file are explained below.
+For more detailed information about the configuration options
+available, type "<span style="font-family: monospace;">man
+dhcpd.conf</span>"
+or "<span style="font-family: monospace;">man
+dhcp-options</span>" at
+the command prompt.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 195px;">Parameter<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 713px;">Definition<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">ddns-update-style<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Type of DDNS update to
+use with local DNS Server<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">ignore
+client-updates<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Ignore all client
+requests for DDNS update<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">lease-file-name<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Filename that stores
+list of active IP lease allocations<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">authoritative<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Set as master server,
+protects against rogue DHCP servers and
+misconfigured clients<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+domain-name<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Specifies the Internet
+Domain Name to append to a client's
+hostname<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+domain-name-servers<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The DNS servers the
+clients should use for name resolution<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">default-lease-time<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The default time in
+seconds that the IP is leased<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">max-lease-time<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The max time in seconds
+that the IP is leased<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+routers<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Specifies the <span style="font-weight: bold;">Gateway</span>
+for the client to use<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+subnet-mask<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The subnet mask specific
+to the lease range<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+broadcast-address<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The broadcast address
+specific to the lease range<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+ntp-servers<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">Network Time Protocol
+servers available to the clients<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 195px;">option
+netbios-name-server<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The NetBIOS name server
+(WINS)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 195px;">option
+netbios-node-type<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The NetBIOS name
+resolution method (8=hybrid)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 195px;">range<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 713px;">The range of valid IP
+addresses available for client offer<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The DHCP server can be quite tricky to configure and normally does not
+provide any error messages when it fails to start as a service. Ensure
+your
+configuration file is formatted similar to the example above, and that
+semicolons complete all the parameter lines.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If the network on which the DHCP server is broadcasting does not have a
+WINS server, then the <span style="font-family: monospace;">netbios-name-server</span>
+and <span style="font-family: monospace;">netbios-node-type</span>
+options should be removed.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="setfixed"></a><a href="#top">Setting
+Fixed Addresses</a></h2>
+
+
+
+
+
+
+
+
+There may be a time when it is necessary for a workstation to be
+assigned a fixed address, this can be easily achieved by setting the
+following details in the bottom of the <span style="font-family: monospace;">/etc/dhcpd.conf</span>
+file.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>host wkstn1 {<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+hardware ethernet
+00:0d:62:d7:a0:12;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+fixed-address 192.168.1.5;<br>
+
+
+
+
+
+
+
+
+}<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Setting fixed addresses saves the operator time by avoiding the manual
+adjustments needed at each workstation. Be sure
+to remove the fixed address when it is no longer required, this is
+particularly important on larger networks where IP allocation needs
+careful management.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="options"></a><a href="#top">Setting
+Daemon Options</a></h2>
+
+
+
+
+
+
+
+
+The DHCP daemon can be configured with command line options by using
+the <span style="font-family: monospace;">/etc/sysconfig/dhcpd</span>
+file. For
+security, DHCP can be bound to an interface so the allocation of
+addresses are only available to the private internal network.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/sysconfig/dhcpd</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Setting this option provides queries and assignment only through this
+interface.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td># Command line options
+here<br>
+
+
+
+
+
+
+
+
+DHCPDARGS=eth1<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="starting"></a><a href="#top">Starting
+DHCP</a></h2>
+
+
+
+
+
+
+
+
+There was no initial DHCP configuration file when we started to set up
+the server. Now that the file has been created and the configurations
+are defined, it would be a good time to make a backup of the file.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/dhcpd.conf /etc/dhcpd.conf.original</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+When the server provides a leased IP address to a client, the details
+of the transaction are stored in the <span style="font-family: monospace;">dhcpd.leases</span>
+file. In some
+distributions this file has not been provided and may need to be
+created before the server will function. The following command prepares
+the <span style="font-family: monospace;">dhcpd.leases</span>
+file for
+use.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">touch
+/var/lib/dhcpd/dhcpd.leases</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The server is now fully configured and its time to determine the
+runlevels and start the service.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 2345 dhcpd on</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">/etc/init.d/dhcpd restart</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You should always check the runlevels after they have been adjusted to
+confirm they will function as required.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig --list
+dhcpd</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Once the service has been started the system log should be checked to
+see if there are any errors. Most important is the security options we
+viewed earlier, which was to make sure the daemon was bound to the
+internal
+interface. The following example shows a binding to <span style="font-family: monospace;">eth0</span>.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">grep dhcpd
+/var/log/messages</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>galaxy dhcpd: Listening
+on LPF/eth1/00:40:05:51:20:e7/192.168.1.0/24<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: Sending on&nbsp;&nbsp;
+LPF/eth1/00:40:05:51:20:e7/192.168.1.0/24<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: Sending on&nbsp;&nbsp;
+Socket/fallback/fallback-net<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: dhcpd startup succeeded<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="testing"></a><a href="#top">Testing The
+Server</a></h2>
+
+
+
+
+
+
+
+
+Now that the server is configured and running successfully, its time to
+test the server by requesting an IP lease from a Linux or Windows
+client. The DHCP protocol uses UDP on port 67 to broadcast for and
+reply
+to DHCP requests, ensure that the clients have access through any
+firewall system to successfully obtain an IP address.<br>
+
+
+
+
+
+
+
+
+<h3>Linux Client</h3>
+
+
+
+
+
+
+
+
+If the Linux client distribution you are testing uses the dhclient
+package from the <a href="http://www.isc.org/">Internet
+Systems
+Consortium</a>, then use the
+following command to obtain a lease for
+the <span style="font-family: monospace;">eth0</span>
+network device.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">dhclient
+eth0&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(EXECUTED ON CLIENT WORKSTATION)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>Internet Systems
+Consortium DHCP Client V3.0.1<br>
+
+
+
+
+
+
+
+
+Copyright 2004 Internet Systems Consortium.<br>
+
+
+
+
+
+
+
+
+All rights reserved.<br>
+
+
+
+
+
+
+
+
+For info, please visit http://www.isc.org/products/DHCP<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+Listening on LPF/eth0/00:0d:62:d7:a0:12<br>
+
+
+
+
+
+
+
+
+Sending on&nbsp;&nbsp; LPF/eth0/00:0d:62:d7:a0:12<br>
+
+
+
+
+
+
+
+
+Sending on&nbsp;&nbsp; Socket/fallback<br>
+
+
+
+
+
+
+
+
+DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 4<br>
+
+
+
+
+
+
+
+
+DHCPOFFER from 192.168.1.1<br>
+
+
+
+
+
+
+
+
+DHCPREQUEST on eth0 to 255.255.255.255 port 67<br>
+
+
+
+
+
+
+
+
+DHCPACK from 192.168.1.1<br>
+
+
+
+
+
+
+
+
+bound to 192.168.1.5 -- renewal in 20509 seconds.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+By viewing the system log after renewing a DHCP client's lease, the
+transaction between client and server can be viewed. The following
+transaction records the fixed address <span style="font-family: monospace;">192.168.1.5</span>
+that was covered
+earlier being assigned to the reserved MAC address.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">grep dhcpd
+/var/log/messages</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(EXECUTED ON DHCP SERVER)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>galaxy dhcpd:
+DHCPDISCOVER from 00:0d:62:d7:a0:12 via eth0<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: DHCPOFFER on 192.168.1.5 to 00:0d:62:d7:a0:12 via eth0<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: DHCPREQUEST for 192.168.1.5 (192.168.1.1) from
+00:0d:62:d7:a0:12 via eth0<br>
+
+
+
+
+
+
+
+
+galaxy dhcpd: DHCPACK on 192.168.1.5 to 00:0d:62:d7:a0:12 via eth0</td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If your Linux client is using the pump dhcpclient, then the following
+commands can be used to release, obtain, or view the status of the
+client.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">pump -i eth0</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">pump -i eth0 --release</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">pump -i eth0 --status</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h3>Windows Client</h3>
+
+
+
+
+
+
+
+
+Testing a Windows based DHCP client is best done from a command prompt
+in the DOS shell, as more information is returned to the user than the
+standard graphical tools.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+To release and renew your windows based IP address, follow these
+examples (expected results are provided).<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">ipconfig
+/release</span><br>
+
+
+
+
+
+
+
+
+      Windows IP Configuration<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+Ethernet adapter Local Area Connection:<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Connection-specific DNS
+Suffix&nbsp; . :<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IP Address. . . . . . . . .
+. . . : 0.0.0.0<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Subnet Mask . . . . . . . .
+. . . : 0.0.0.0<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Default Gateway . . . . . .
+. . . :<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">ipconfig
+/renew</span><br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+Windows IP Configuration<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+Ethernet adapter Local Area Connection:<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Connection-specific DNS
+Suffix&nbsp; . : example.com<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IP Address. . . . . . . . .
+. . . : 192.168.1.5<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Subnet Mask . . . . . . . .
+. . . : 255.255.255.0<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Default Gateway . . . . . .
+. . . : 192.168.1.1<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The following command will provide more detailed information about the
+leased IP address and associated network resources.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">ipconfig
+/all</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Some Windows based
+antivirus and firewall applications
+restrict the local workstation from broadcasting for an IP address, and
+may need to be configured to allow such requests.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="09-Network_Time_Protocol.html">Previous</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="11-Squid_Web_Proxy.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+</body>
+</html>

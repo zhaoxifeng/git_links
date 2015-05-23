@@ -1,0 +1,6806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - SAMBA</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+</div>
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="17-MySQL_Server.html">Previous</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="19-Network_File_System.html">Next</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<hr>
+<h1>Chapter
+18 - Samba<br>
+
+
+
+
+
+</h1>
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+      <td>- samba 3.0.22</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+<a href="#global">Setting Global Options</a><br>
+
+
+
+
+
+<a href="#useraccounts">Creating User Accounts</a><br>
+
+
+
+
+
+<a href="#shareddirs">Sharing Network Directories</a><br>
+
+
+
+
+
+<a href="#addprns">Adding Network Printers</a><br>
+
+
+
+
+
+<a href="#winclient">The Microsoft Client</a><br>
+
+
+
+
+
+<a href="#smbclient">The Samba Client</a><br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Samba is a suite of opensource applications that support the Server
+Message Block (SMB) and Common Internet File System (CIFS) protocols
+used by Microsoft operating systems. This allows the Samba applications
+to interface into Microsoft networks to provide interoperability across
+normally different networking systems.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The biggest advantage of Samba is its ability to be configured as a
+Windows NT style domain controller/server allowing it to be used as a
+central server for many Microsoft based workstations. All of the
+printing resources, share permissions, and user account details can be
+maintained by the Linux Samba server. This provides a cost effective
+server system that can be deployed into many small, medium, or even
+large networking environments. Samba is also able to operate its own
+Windows Internet Naming Service (WINS) to provide full NetBIOS naming
+resolution.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Samba provides many configurable capabilities for many different
+deployment options, however being a home server guide, this chapter
+will provide only the requirements to establish a standalone server
+which is suitable for a small peer-to-peer network. The guide will
+provide the examples necessary to allow Samba to maintain all the
+files, share, and resource permissions for the connecting workstations.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The chapter will not cover advanced options for interfacing with any
+real Windows Domain or Active Directory Servers.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="global"></a><a href="#top">Setting Global Options</a><br>
+
+
+
+
+
+</h2>
+
+
+
+
+
+The configuration file for Samba is relatively easy to interpret as
+there are ample comments throughout the file for guidance. There are
+also some very well documented man pages available to further assist
+with your configuration requirements.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The main Samba configuration file should be backed up before any
+settings are changed, so we can at least restore a good file when
+problems occur.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp /etc/samba/smb.conf /etc/samba/smb.conf.original</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/samba/smb.conf</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The configuration file really only has one main section. The [global]
+section and its directives provide all the options and parameters
+required for the Samba daemon (smbd) and NetBIOS daemon (nmbd) to
+operate within the network. This (in a nutshell) is how your server
+will operate and be seen on the network.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+All other sections of the smb.conf file which are specified with square
+brackets "[something]", is start of a share definition and contain all
+of
+the options and parameters that pertain only to the resource that is
+being shared. Any directives that are specified within a share will
+override any directives that are specified in the global section.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following directives define the start of the global configuration
+options and more importantly, provides the options that identify the
+server on the network, they are the names for your networking
+environment.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[global]<br>
+
+
+
+
+
+&nbsp;&nbsp; workgroup = WORKGROUP<br>
+
+
+
+
+
+&nbsp;&nbsp; netbios name = GALAXY<br>
+
+
+
+
+
+&nbsp;&nbsp; server string = Samba Server<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+These directives are networking orientated and define which networking
+interfaces to operate on and which subnetworks are allowed to connect
+to your server. These are important to specify so the server it
+protected from any possible connections that are attempted from the
+external network.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>&nbsp;&nbsp; interfaces = eth1
+lo<br>
+
+
+
+
+
+&nbsp;&nbsp; hosts allow = 192.168.1. 127.0.0.1<br>
+
+
+
+
+
+&nbsp;&nbsp; socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+You should specify a log file for the server. Here the "<span style="font-family: monospace;">%m.log</span>" definition means that
+each workstation connecting to the server will have its own log file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&nbsp;&nbsp; log file = /var/log/samba/%m.log<br>
+
+
+
+
+
+&nbsp;&nbsp; max log size = 50<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Some windows clients before Windows 98 and Windows NT (SP3) do not
+support encrypted passwords, you may need to adjust this if you are
+using very old Microsoft clients.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Samba will store passwords in encrypted format by default.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&nbsp;&nbsp; encrypt passwords = yes<br>
+
+
+
+
+
+&nbsp;&nbsp; smb passwd file = /etc/samba/smbpasswd<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following options detail how your Samba server will behave on your
+network.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">security</span>" directive
+determines whether the server will function as a Windows Domain
+Controller or as a simple standalone server for a peer-to-peer system,
+the "<span style="font-family: monospace;">user</span>" option is the
+default mode.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">wins support</span>" option
+tells the server to run its own WINS server for name resolution, this
+is typical of many Microsoft networks. "dns proxy" is not required for
+a small network and can be disabled.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The remaining settings determine if the server will advertise itself as
+a master browser on the network, this will cause the server to
+participate in network browser elections and attempt to become the
+master browser.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&nbsp;&nbsp; security = user<br>
+
+
+
+
+
+&nbsp;&nbsp; local master = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; os level = 33<br>
+
+
+
+
+
+&nbsp;&nbsp; domain master = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; preferred master = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; wins support = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; dns proxy = No<br>
+
+
+      <br>
+
+
+&nbsp; &nbsp;passdb backend = smbpasswd<br>
+
+
+&nbsp; &nbsp;passdb expand explicit = No </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The mask directives determine the local file permissions for any new
+files or directories that are created in any of the shared resources.
+These global values can be overriden for each share, allowing for finer
+control of permissions.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&nbsp;&nbsp; create mask = 0644<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0755<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+      <td>Using
+all of the above configurations, the Samba server will now be
+configured to
+run on the appropriate network and can be seen from your Windows based
+clients, however no network shares or user access has been granted yet.
+      <br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Samba provides a small test application that reads the configuration
+file and tests it for any errors, this ensures that the new
+configuration should be excepted by the server. Any errors should be
+fixed before restarting the server and loading the faulty configuration.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following <span style="font-family: monospace;">testparm</span>
+output is from a configuration file that contains only the <span style="font-family: monospace;">[global]</span> section (as per all of
+the above settings), no other share sections have yet been defined.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">testparm</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Load smb config files from /etc/samba/smb.conf<br>
+
+
+
+
+
+Loaded services file OK.<br>
+
+
+
+
+
+Server role: ROLE_STANDALONE<br>
+
+
+
+
+
+Press enter to see a dump of your service definitions<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The appropriate runlevels that the service will operate at can now
+be set and checked.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>[bash]# <span style="font-weight: bold;">chkconfig --level 345
+smb on</span><br>
+
+
+
+
+
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>[bash]# <span style="font-weight: bold;">chkconfig --list smb</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+All of the global section options have now been specified for your
+configuration and the server can now be started. Be sure to check all
+the log files to ensure the server started cleanly and there are no
+errors.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>[bash]# <span style="font-weight: bold;">/etc/init.d/smb restart</span><br>
+
+
+
+
+
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>[bash]# <span style="font-weight: bold;">tail -n 50
+/var/log/messages</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">cat /var/log/samba/smbd.log</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">cat /var/log/samba/nmbd.log</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+      <td>If
+any of the server's networking parameters have been adjusted, it may
+take a few minutes before the server can be seen from the Windows
+client after restarting the smb service.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Both of the smbd and nmbd daemons are started by the initscripts. Any
+command line options that need to be specified for the daemons can be
+listed in the "/etc/sysconfig/samba" file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/sysconfig/samba</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following list of man pages can provide further information to
+assist with configuration or debugging requirements.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="background-color: rgb(220, 220, 220); width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+      <td colspan="3" rowspan="1" style="background-color: rgb(255, 255, 255); font-weight: bold; width: 660px;">Man
+Pages:<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">samba<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">smb.conf<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 660px;">smbstatus</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">smbd<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">smbclient<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 660px;">findsmb</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">nmbd<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 120px;">smbmount<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 660px;">testparm</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Resolving Hostnames</h3>
+
+
+
+
+
+If the Samba server was configured to provide WINS support ("<span style="font-family: monospace;">wins support = Yes</span>"), then the
+WINS server is able to provide name resolution for all of the hosts
+that are not listed in the /etc/hosts file or within the DNS.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/nsswitch.conf</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>hosts:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; files dns wins </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Making this adjustment in the Name Service Switch configuration file
+(/etc/nsswitch.conf) allows the Linux
+system to query the WINS server for local name resolution. This saves
+manual adjustments to host files.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="useraccounts"></a><a href="#top">Creating User Accounts</a>
+</h2>
+
+
+
+
+
+Before the Samba server can be accessed across the network, access must
+be granted to users and any shared resources which are going to be
+provided by the server. Basically, for a user to be granted access to
+the server they need to have a valid UNIX account and a separate Samba
+password which
+is stored in the "<span style="font-family: monospace;">smb password
+file</span>", so infact a users password for their UNIX account may be
+different to their Samba account.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+In the following example a UNIX account is being created for Alice. It
+details her full name (<span style="font-family: monospace;">-c</span>),
+her home directory (<span style="font-family: monospace;">-d</span>)
+and prevents her
+from logging into the Linux server by allocating her a false shell
+(<span style="font-family: monospace;">-s</span>). This account type
+will only allow Alice to access the server via the Samba network. This
+entry is located in the /etc/passwd file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">useradd -c "Alice Jones" -d /home/alice -s
+/sbin/nologin alice</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Alice now needs to be allocated a password for accessing the Samba
+server. Remember, this is a separate password to her UNIX account any
+may be different if necessary.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">smbpasswd -a alice</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>New SMB password:<br>
+
+
+
+
+
+Retype new SMB password:<br>
+
+
+
+
+
+Added user alice.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The above command adds (<span style="font-family: monospace;">-a</span>)
+an entry into the "<span style="font-family: monospace;">smb password
+file</span>" and encrypts
+the password. Type "<span style="font-family: monospace;">smbpasswd
+alice</span>" to simply change passwords.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Alice can now access the server over the network, however there are
+still no shares defined.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">grep alice /etc/samba/smbpasswd</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>alice:4732:01FC5A6BE7BC6929AAD3B435B51404EE:0CB6948805F797BF2A82807973B89537:[U&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+]:LCT-41CFEFD8:<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+If Alice's account needs to be deleted, the following command can be
+used. Alternatively her account can be disabled (<span style="font-family: monospace;">-d</span>) or enabled (<span style="font-family: monospace;">-e</span>) as
+required.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">smbpasswd -x alice</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Deleted user alice.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Mapping Different Usernames</h3>
+
+
+
+
+
+There may be a requirement where the samba username being used to
+access the server does not match the same UNIX account username, or you
+would like to force a change between the two different account types.
+This can easily be done by implementing the "<span style="font-family: monospace;">username map</span>" directive into
+the [global] section of the main configuration file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/samba/smb.conf</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span><span style="font-family: monospace;">[global]<br>
+
+
+
+
+
+&nbsp;&nbsp; username map = /etc/samba/smbusers<br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The username map feature is fairly simple, the file takes a UNIX
+account name on the left hand side and Samba account names on the right
+hand side (separated by "="). The username map allows those NT accounts
+listed on the RHS to be granted the access rights and file permissions
+of the UNIX account on the LHS when they connect to a resource.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+In the following example:<br>
+
+
+
+
+
+<ul>
+
+
+
+
+
+  <li>The NT usernames "administrator" and "admin" will be mapped to
+the UNIX "root" account,</li>
+
+
+
+
+
+  <li>The NT usernames "guest", "pcguest" and "smbguest" will be mapped
+to the UNIX "nobody" account,</li>
+
+
+
+
+
+  <li>The NT username "alice" will be mapped to the UNIX "alice.jones"
+account,<br>
+
+
+
+
+
+  </li>
+
+
+
+
+
+  <li>All four NT Users (glen, fred, terry and sarah) will be mapped to
+the single UNIX "readonly" account, and<br>
+
+
+
+
+
+  </li>
+
+
+
+
+
+  <li>The NT username "Lachlan Smith" will be mapped to the UNIX
+"lachlan" account.</li>
+
+
+
+
+
+</ul>
+
+
+
+
+
+The last example uses quotes around the NT username because there is a
+space separating the user's first and last names. Failure to use quotes
+on an NT username containing a space means that Samba will treat the
+user's name as two separate UNIX accounts; this will course the
+connections to fail.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/samba/smbusers</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span><span style="font-family: monospace;"># Unix_name = SMB_name1 SMB_name2 ...<br>
+
+
+
+
+
+root = administrator admin<br>
+
+
+
+
+
+nobody = guest pcguest smbguest<br>
+
+
+
+
+
+alice.jones = alice<br>
+
+
+
+
+
+readonly = glen fred terry sarah<br>
+
+
+
+
+
+lachlan = "Lachlan Smith"<br>
+
+
+
+
+
+      </span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+      <td>Further details on mapping usernames can be obtained in the
+configuration man page, type "<span style="font-family: monospace;">man
+smb.conf</span>".<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="shareddirs"></a><a href="#top">Sharing Network Directories</a>
+</h2>
+
+
+
+
+
+The main purpose of setting up a Samba server is to provide networked
+resources to your Microsoft workstations and clients, so lets set up
+some resources for them to connect to and use.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Shared resources are specified as sections within the
+/etc/samba/smb.conf file, the sections are identified by using squared
+brackets around each of the section names, similar to the global
+section.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/samba/smb.conf</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The first share that can be configured are the home directories for all
+the connecting users. The [homes] section is a special configuration
+and Samba already knows how to handle all the users different home
+directories, it really only needs to be specified and Samba will do the
+rest.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[homes]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = Home Directory<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = No<br>
+
+
+
+
+
+&nbsp;&nbsp; valid users = %S<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The [Shared] section that we have created below allows access to all of
+the files and directories within the /samba/shared local directory. The
+resource can be written to by all guest and public users and the
+resource can be viewed (browseable) by workstations and clients on the
+network.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Any new directory created in the share will be given the directory
+permissions of 777, and any new file will have file permissions of 666.
+These mask settings allow any user to save files to the shared
+directory, and any other user can read, write or delete the files.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[Shared]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = Global Share - All Users<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /samba/shared<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = Yes<br>
+
+
+
+
+
+      <span style="font-family: monospace;">&nbsp;&nbsp; public = Yes</span><br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; create mask = 0666<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0777<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The [SmallGroup] example section is not allowed to have guest or public
+access, but the resource can be viewed by networked workstations and
+clients.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Any new directory created in the share will be given the directory
+permissions of 777, and any new file will have file permissions of 666.
+The only valid user accounts that can connect to this resource are
+peter,
+paul, and mary.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[SmallGroup]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = Small Share - Few Users<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /samba/smallgroup<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = No<br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; create mask = 0666<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0777<br>
+
+
+
+
+
+&nbsp;&nbsp; valid users = peter, paul, mary<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The [Financial] example resource can be viewed by all networked
+workstations and clients but is not publicly accessible. Any new
+directory created in the share will be given the directory
+permissions of 770, and any new file will have file permissions of 660.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The only valid users that are allowed to access this resource are UNIX
+user accounts listed in the UNIX group file (/etc/groups) called
+"financial". This is specified by the "@finanical" parameter.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Any file or directory that is created on the shared resource will have
+the (forced) group name of "financial" applied to it, this is similar
+to typing "<span style="font-family: monospace;">chgrp financial *</span>"
+at the Linux command prompt.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[Financial]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = RESTRICTED - Financial Cell<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /samba/financial<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = No<br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; create mask = 0660<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0770<br>
+
+
+
+
+
+&nbsp;&nbsp; valid users = @financial<br>
+
+
+
+
+
+&nbsp;&nbsp; force group = financial<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Below is an example [FTP-Server] resource which is mapped to the root
+of the FTP Server (/var/ftp) running on the local Samba server. The
+share has been configured so it is publicly accessible to everyone on
+the network, but the filesystem is read only. All new files and
+directories will have the file permissions of 755.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">write list</span>" directive
+overrides the "<span style="font-family: monospace;">read only</span>"
+directive, which means in this example that the two users (john and
+fred) can fully manage all the files and resources like a normal share.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">force group</span>" and "<span style="font-family: monospace;">force user</span>" directives specify
+that any new files or directories will be processed as belonging to the
+UNIX ftp user account. This is similar to typing "<span style="font-family: monospace;">chown ftp.ftp *</span>" at the command
+prompt and also makes the files readily accessible by the FTP server.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[FTP-Server]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = READ ONLY - Corp FTP Server<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /var/ftp<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; create mask = 0755<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0755<br>
+
+
+
+
+
+&nbsp;&nbsp; write list = john, fred<br>
+
+
+
+
+
+&nbsp;&nbsp; force group = ftp<br>
+
+
+
+
+
+&nbsp;&nbsp; force user = ftp<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The [WEB-Server] example share is mapped to the "document root"
+(/var/www/html) of the Apache web server running on the local Samba
+server. The "<span style="font-family: monospace;">browseable = No</span>"
+directive tells the Samba server not to tell any networked workstations
+and clients that the resource is available, this requires that a
+connecting client must already know the resource is shared as
+"WEB-Server". In effect the resource is available to the valid users
+but is hidden from view.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The filesystem has also be marked as read only but can be fully
+administered by the UNIX user account called fred. All files and
+directories written to the networked share will be forced to belong to
+the root group and user accounts.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+This is a fairly powerful share as the effective user (fred) will have
+root privileges to the filesystem located under the /var/www/html
+directory. It also allows fred (the local webmaster) to add or update
+any web pages as required.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[WEB-Server]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = HIDDEN - Corp Web Server<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /var/www/html<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = No<br>
+
+
+
+
+
+&nbsp;&nbsp; browseable = No<br>
+
+
+
+
+
+&nbsp;&nbsp; create mask = 0644<br>
+
+
+
+
+
+&nbsp;&nbsp; directory mask = 0755<br>
+
+
+
+
+
+&nbsp;&nbsp; write list = fred<br>
+
+
+
+
+
+&nbsp;&nbsp; force group = root<br>
+
+
+
+
+
+&nbsp;&nbsp; force user = root<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Before any configuration changes are implemented, the configuration
+file should be tested to ensure it is free from any errors and that the
+new configuration will be accepted by the server. Any errors should be
+fixed before restarting the server and loading the faulty configuration.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">testparm</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Load smb config files from /etc/samba/smb.conf<br>
+
+
+
+
+
+Processing section "[homes]"<br>
+
+
+
+
+
+Processing section "[Shared]"<br>
+
+
+
+
+
+Processing section "[SmallGroup]"<br>
+
+
+
+
+
+Processing section "[Financial]"<br>
+
+
+
+
+
+Processing section "[FTP-Server]"<br>
+
+
+
+
+
+Processing section "[WEB-Server]"<br>
+
+
+
+
+
+Loaded services file OK.<br>
+
+
+
+
+
+Server role: ROLE_STANDALONE<br>
+
+
+
+
+
+Press enter to see a dump of your service definitions<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Still Getting "Access Denied" Errors</h3>
+
+
+
+
+
+You may have successfully created all of your shares for the Samba
+server and they may all be publicly accessible to the client
+workstation, however you may still be getting "Access Denied" errors on
+your Windows workstation. This normally occurs when the underlying file
+and directory permissions on the Linux filesystem are not appropriate
+to what the user has been granted.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The [Shared] section which we declared earlier in our set up has been
+configured to allow full permissions for everyone to access the shared
+resource. For Samba to fully support the requirements here, the
+"/samba/shared" directory must be assigned the directory permissions of
+777, the default directory permissions of 755 would not allow all world
+users to create new files, regardless of the two "mask" declarations.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Similary the [Financial] section is only available to valid users of
+the UNIX "financial" group and should therefore have the directory
+permissions of 770 assigned to the "/samba/financial" directory. The
+group allocation should also be changed with the "<span style="font-family: monospace;">chgrp financial /samba/financial</span>"
+command, this
+allows the valid users to access the resource with the finanical group
+permissions.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The incorrect assignment of file and directory permissions are the main
+reason why "Access Denied" errors occur when accessing the system with
+a valid user account. You should always confirm what permissions a
+resource is to be allocated, and ensure the "[section]" and filesystem
+permissions are assigned correctly.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="addprns"></a><a href="#top">Adding Network Printers</a>
+</h2>
+
+
+
+
+
+In <a href="15-System_Printing.html">chapter 15</a> we configured CUPS
+to handle our network printing requirements, but just like any other
+shared resource, Samba can also be configured to provide access to any
+locally attached printers allowing another centrally managed printing
+system for the remote workstations. Configuring printing shares in
+Samba is quite easy, but it does assume that printers have already been
+configured through CUPS first.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+      <td>If
+you would prefer your network printers to only be accessible through
+Samba, then CUPS should be configured so only the localhost
+(127.0.0.1) has access to the printers. This way print jobs must be
+sent to the Samba server, which passes them onto the local CUPS server
+on behalf of the user.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+We now need to add the printing sections into the main configuration
+file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/samba/smb.conf</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To enable Samba to process your printing requirements, the follow
+directives must be added under the [global] section of the
+configuration file. These directives only load printing support into
+the server, they do not share any attached printers, they still need to
+be declared with their own configuration section and controls.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"><tt>[global]<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>load printers = yes<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+printing = cups<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+printcap name = cups<br>
+
+
+&nbsp; &nbsp;cups options = raw<br>
+
+
+
+
+
+      </tt></span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following [printers] section is another "built-in" configuration
+that is natively supported by Samba. This section automatically loads
+all of the attached printers and makes them all individually available
+from the server, so if you had three CUPS printers then the following
+example would make all three available to the network users.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">admin users</span>"
+directive below is allowing any user listed in the UNIX "printadmins"
+group to fully administer all of the network printers. It is a good
+idea to configure a group of printing admins, as a print job that has
+been scheduled by one normal user account can not be managed or deleted
+by another normal user account; this can cause problems if a print job
+has stalled the printing queue and the owner is not available to delete
+the faulty print job.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">use client driver</span>"
+allows non root/admin users to view the contents of the print queue on
+the remote server. This fixes the "Access denied, unable to connect"
+error that many Windows clients suffer when connecting to Samba
+printers.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span><span class="parameter"><tt>[printers]<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>comment = Network Printers<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+path = /var/spool/samba<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+browseable = No<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+public = Yes<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+guest ok = Yes<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+writable = No<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>
+printable = Yes<br>
+
+
+
+
+
+      </tt></span><span class="parameter"><tt>&nbsp;&nbsp; </tt></span><span class="parameter"><tt>admin users = @printadmins</tt></span><span class="parameter"></span><br>
+
+
+
+
+
+      <span class="parameter"><tt>&nbsp;&nbsp; </tt></span>
+use client driver = Yes </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following command can be used to create a UNIX "printadmins" group
+for
+administering the network printers. Users can be added into the
+printadmins group by using the usermod command, or by manually editing
+the /etc/group file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">groupadd printadmins</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">usermod -G printadmins alice</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">usermod -G printadmins bob</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/group</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<span style="font-family: monospace;"><br>
+
+
+
+
+
+</span>There may be a requirement for you to control different access
+restrictions to your printers, like allowing everyone access to the
+black and white laser printer, but restricting the colour bubblejet to
+only a few select users.<span style="font-family: monospace;"><br>
+
+
+
+
+
+</span><br>
+
+
+
+
+
+If different access controls are required for your printing
+environment, then you should remove the standard [printers] section and
+create a new section for each of your individual printers. This way
+options can be specified to suit each individual printer.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[laser]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = Brother HL-1430
+Laser Printer<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /var/spool/samba<br>
+
+
+
+
+
+&nbsp;&nbsp; admin users = @printadmins<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; guest ok = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; printable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; printer name = laser<br>
+
+
+
+
+
+&nbsp;&nbsp; use client driver = Yes </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bubblejet]<br>
+
+
+
+
+
+&nbsp;&nbsp; comment = HP PhotoSmart 7200
+Series<br>
+
+
+
+
+
+&nbsp;&nbsp; path = /var/spool/samba<br>
+
+
+
+
+
+&nbsp;&nbsp; admin users = @printadmins<br>
+
+
+
+
+
+&nbsp;&nbsp; read only = No<br>
+
+
+
+
+
+&nbsp;&nbsp; valid users = mary @printadmins<br>
+
+
+
+
+
+&nbsp;&nbsp; printable = Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; printer name = bubblejet<br>
+
+
+
+
+
+&nbsp;&nbsp; use client driver = Yes</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+All configuration changes should be tested with the <span style="font-family: monospace;">testparm</span> command before
+implemention.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">testparm</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Load smb config files from /etc/samba/smb.conf<br>
+
+
+
+
+
+Processing section "[homes]"<br>
+
+
+
+
+
+Processing section "[laser]"<br>
+
+
+
+
+
+Processing section "[bubblejet]"<br>
+
+
+
+
+
+Loaded services file OK.<br>
+
+
+
+
+
+Server role: ROLE_STANDALONE<br>
+
+
+
+
+
+Press enter to see a dump of your service definitions<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="winclient"></a><a href="#top">The Microsoft Client</a></h2>
+
+
+
+
+
+The server is now fully configured and operating on the network and all
+that is waiting now, is for the workstations and clients to connect.
+The Microsoft Windows clients all use a graphical
+network viewer for displaying the available resources on the network.
+This may be all that a user requires in a small office or home
+environment to connect and use the Samba shares, however the following
+MSDOS commands can be typed at the
+command prompt to automate any procedures.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">net view</span>" command
+provides a list of all the workstations that are grouped together in
+the
+same workgroup or domain.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net view</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Server
+Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Remark<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+-------------------------------------------------------------------------------<br>
+
+
+
+
+
+\\GALAXY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Server<br>
+
+
+
+
+
+\\WINBOX1<br>
+
+
+
+
+
+\\WINBOX2<br>
+
+
+
+
+
+\\WINBOX3<br>
+
+
+
+
+
+\\WINBOX4<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To see a listing of all the available resources on the Samba server,
+the following command can be used. The output is a listing of all the
+networked shares, the type of share it is, and a description that was
+defined in the share's "comment" parameter.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+You should notice here that the WEB-Server share was configured with "<span style="font-family: monospace;">browseable = No</span>" which prevents
+it from being listed, however it can still be mapped by valid users
+(fred).<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net view \\galaxy</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Shared resources at \\galaxy<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+Share name&nbsp; Type&nbsp;&nbsp; Used as&nbsp; Comment<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+-------------------------------------------------------------------------------<br>
+
+
+
+
+
+alice&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Disk&nbsp;&nbsp; &nbsp;
+&nbsp;&nbsp; &nbsp; &nbsp; Home Directory<br>
+
+
+
+
+
+bubblejet&nbsp;&nbsp;
+Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Bubblejet - HP PhotoSmart-7260<br>
+
+
+
+
+
+Financial&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RESTRICTED - Financial Cell<br>
+
+
+
+
+
+FTP-Server&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+READ ONLY - Corp FTP Server<br>
+
+
+
+
+
+laser&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Print&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;&nbsp; Laser Printer - Brother HL-1430<br>
+
+
+
+
+
+Shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Disk&nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Global Share - All Users<br>
+
+
+
+
+
+SmallGroup&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Small Share - Few Users<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Typing "net use" obtains a local listing of the resources that are
+currently mapped to the Samba server, and their drive letters which are
+accessible under Windows.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>New connections will be remembered.<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Local&nbsp;&nbsp;&nbsp;&nbsp;
+Remote&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Network<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+-------------------------------------------------------------------------------<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+E:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\\galaxy\Financial&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Microsoft
+Windows Network<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+F:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \\galaxy\FTP-Server
+&nbsp;&nbsp; &nbsp;&nbsp; Microsoft Windows Network<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+G:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\\galaxy\SmallGroup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Microsoft
+Windows Network<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To map a drive letter to a users home directory we can specify the
+windows %username% variable which stores the value of the currently
+logged in username.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use h: \\galaxy\%username%</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following two commands are simple drive mappings to shared
+directories.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use i: \\galaxy\shared</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use w: \\galaxy\WEB-Server</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Remote printers can also be mapped to local printer ports, below is a
+mapping for both of the shared printers.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use lpt1 \\galaxy\laser</span><br>
+
+
+
+
+
+C:\&gt;<span style="font-weight: bold;">net use lpt2 \\galaxy\bubblejet</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "net use" command can be used again to see that status of our newly
+connected shares.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+H:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \\galaxy\alice &nbsp;
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Microsoft Windows Network<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+I:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \\galaxy\Shared &nbsp;
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; Microsoft Windows Network<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+W:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \\galaxy\WEB-Server
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Microsoft Windows Network<br>
+
+
+
+
+
+OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+LPT1:&nbsp;&nbsp;&nbsp;&nbsp; \\galaxy\laser &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Microsoft Windows Network </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "net use" command can also be used to disconnect from a shared
+resource.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">net use w: /delete</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Automating the Connections</h3>
+
+
+
+
+
+The Microsoft windows clients are able to automate drive and printer
+mappings by using a login script. When connecting MS workstations in a
+large scale network, login scripts are normally always used to
+configure the
+local workstations and user accounts to meet the needs and policies of
+the organisation.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following is an example login batch script for Windows workstations.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>C:\&gt;<span style="font-weight: bold;">edit login.bat</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>@echo off<br>
+
+
+
+
+
+cls<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+echo Mapping Network Resources...<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+echo Mapping: Home Directory<br>
+
+
+
+
+
+net use h: \\galaxy\%username%<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+echo Mapping: Shared Directory<br>
+
+
+
+
+
+net use s: \\galaxy\shared<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+echo Mapping: Laser Printer<br>
+
+
+
+
+
+net use lpt1: \\galaxy\laser<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+echo Mapping: Bubblejet Printer<br>
+
+
+
+
+
+net use lpt2: \\galaxy\bubblejet<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="smbclient"></a><a href="#top">The Samba Client</a></h2>
+
+
+
+
+
+The Samba suite of applications are not just for server use, they can
+also enable a Linux workstation the ability to mount a shared Windows
+resource as part of its own filesystem. The smbclient application
+requires the use of a valid username and password that has been
+configured on the Microsoft server/workstation that it will be
+connecting too, unless the guest account has been enabled on the target
+system.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+To obtain a complete list of all the workstations available on the
+local network, type the "<span style="font-family: monospace;">findsmb</span>"
+command at the prompt.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">findsmb</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+*=DMB<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++=LMB<br>
+
+
+
+
+
+IP ADDR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NETBIOS
+NAME&nbsp;&nbsp;&nbsp;&nbsp; WORKGROUP/OS/VERSION<br>
+
+
+
+
+
+---------------------------------------------------------------------<br>
+
+
+
+
+
+192.168.1.1 &nbsp;&nbsp;&nbsp;
+GALAXY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *[MYGROUP] [Unix]
+[Samba 3.0.10-2]<br>
+
+
+
+
+
+192.168.1.101 &nbsp; WINBOX1&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[WINBOX1] [Windows 5.1] [Windows 2000 LAN Manager]<br>
+
+
+
+
+
+192.168.1.102 &nbsp; WINBOX2&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[WINBOX2] [Windows 5.1] [Windows 2000 LAN Manager]<br>
+
+
+
+
+
+192.168.1.103 &nbsp; WINBOX3&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[WINBOX3] [Windows 5.1] [Windows 2000 LAN Manager]<br>
+
+
+
+
+
+192.168.1.104 &nbsp; WINBOX4&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[WINBOX4] [Windows 5.1] [Windows 2000 LAN Manager]<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The smbclient can be used to obtain a detailed list of shared resources
+from a specified host on the local network. In this example we are
+asking for a list of resources from the Samba server called "galaxy".
+Because the server is not configured with an active guest account, we
+need to pass a valid username (<span style="font-family: monospace;">-U</span>)
+in the process, in this case alice.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">smbclient -U alice -L
+galaxy</span><br>
+
+
+
+
+
+Password:<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Domain=[GALAXY] OS=[Unix] Server=[Samba 3.0.10-2]<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Sharename&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Comment<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Global Share - All Users<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+SmallGroup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Small Share - Few Users<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Financial&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RESTRICTED - Financial Cell<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+FTP-Server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ ONLY - Corp FTP Server<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IPC$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IPC Service (Samba Server)<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ADMIN$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IPC Service (Samba Server)<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+bubblejet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Printer&nbsp;&nbsp; HP
+PhotoSmart 7200
+Series<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+laser&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer&nbsp;&nbsp; Brother HL-1430
+Laser Printer<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alice
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Home Directory<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+Domain=[GALAXY] OS=[Unix] Server=[Samba 3.0.10-2]<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Comment<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Workgroup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Master<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+MYGROUP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+GALAXY<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following example is similar to above, however we are obtaining a
+list from the Microsoft client called "winbox1" which is a Windows XP
+desktop. A valid username (<span style="font-family: monospace;">-U</span>)
+is also used in the remote request.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">smbclient -U alice -L
+winbox1</span><br>
+
+
+
+
+
+Password:<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Domain=[WINBOX1] OS=[Windows 5.1] Server=[Windows 2000 LAN
+Manager]<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Sharename&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Comment<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+E$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default share<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IPC$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remote IPC<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default share<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ADMIN$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remote Admin<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default share<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Disk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Full Share for ALL !!!<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+Domain=[WINBOX1] OS=[Windows 5.1] Server=[Windows 2000 LAN Manager]<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Comment<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Workgroup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Master<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+After you have browsed the network computers and found a valid resource
+to connect to, the smbmount command can be used to mount the remote
+share into the filesystem of your Linux workstation. This command is
+assuming there is guest access available on the winbox1 windows
+computer.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">smbmount
+//winbox1/Shared /media/winbox1/shared -o guest</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following two commands are essentially exactly the same, they are
+both connecting the remote "C" drive to the /media/winbox1/cdrive mount
+point. They are also connecting as the remote "administrator" account
+and being prompted for the accounts password.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">smbmount //winbox1/C$
+/media/winbox1/cdrive -o username=administrator</span><br>
+
+
+
+
+
+Password:<br>
+
+
+
+
+
+      <span class="parameter"></span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">mount -t smbfs
+//winbox1/C$ /media/winbox1/cdrive -o username=administrator</span><br>
+
+
+
+
+
+Password:<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+This command is the same as the two above commands, however the
+password is being declared on the command line. This command can be
+used to automate a connection using shell scripts, however it may also
+disclose the username and password combination to unauthorised users.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">smbmount //winbox1/C$
+/media/winbox1/cdrive -o username=administrator,password="secret"</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To disconnect a remote resource from its mount point, use the following
+"<span style="font-family: monospace;">umount</span>" command.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">umount
+/media/winbox1/cdrive</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To view all the currently active connections, you can view the contents
+of the "<span style="font-family: monospace;">/etc/mtab</span>" file.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">cat /etc/mtab</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>//winbox1/C$ /media/winbox1/cdrive smbfs&nbsp; 0 0<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To automate SMB connections during system startup, an entry similar to
+the example below can be placed into the "/etc/fstab" file. You should
+be aware that the /etc/fstab file is world readable.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td><span class="parameter"></span>[bash]# <span style="font-weight: bold;">vi /etc/fstab</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>//winbox1/Shared&nbsp;&nbsp;&nbsp;
+/media/winbox1/shared &nbsp;&nbsp; smbfs&nbsp;&nbsp;&nbsp;
+noauto,user,username=alice,password=secret 0 0 </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!" src="images/warning.gif"></td>
+
+
+
+
+
+      <td>The
+file permissions for the /etc/fstab file are world readable, therefore
+any local user on the Linux system can view the username and password
+combination inside the file.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+For further details on automatically mounting remote SMB shares, type "<span style="font-family: monospace;">man fstab</span>" at the command
+prompt.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="17-MySQL_Server.html">Previous</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="19-Network_File_System.html">Next</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+</body>
+</html>

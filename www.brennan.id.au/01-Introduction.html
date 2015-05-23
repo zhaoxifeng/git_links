@@ -1,0 +1,1853 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+  
+
+
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Introduction</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+</div>
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="index.html">Previous</a><br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="02-Planning_Considerations.html">Next</a><br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<hr>
+<h1><span style="font-weight: bold;">Chapter
+1 - Introduction<br>
+
+
+
+
+</span></h1>
+
+
+
+
+<a href="#about">About
+This HOWTO</a><br>
+
+
+
+
+<a href="#assumptions">Reader
+Assumptions</a><br>
+
+
+
+
+<a href="#feedback">Providing
+Feedback</a><br>
+
+
+
+
+<a href="#conventions">Document
+Conventions</a><br>
+
+
+
+
+<a href="#thanks">Acknowledgments
+and Thanks</a><br>
+
+
+
+
+<a href="#copyright">Copyright
+Notice</a><br>
+
+
+
+
+<a href="#trademarks">Registered
+Trademarks</a><br>
+
+
+
+
+<br>
+
+
+
+
+<span style="font-weight: bold;">
+</span>
+<h2><a name="about"></a><a href="#top"><span style="font-weight: bold;">About
+This HOWTO</span></a></h2>
+
+
+
+
+Building your own fully operational networked server can be greatly
+satisfying. More important, it can provide you with much freedom to do
+as you please without depending on someone else's systems. Manage your
+own email, run your own web server, host multiple websites, even
+operate your own database applications. Next time your ISPs email
+server crashes, you won't be affected.
+
+
+<br>
+
+<br>
+
+
+
+
+This HOWTO will explore some of the standard types of applications and
+services available to configure a dedicated Linux network server. This
+type of
+server configuration is perfectly suited to the home user, or can also
+provide the basis for a small to medium office system.
+
+
+<br>
+
+<br>
+
+
+
+
+The HOWTO is considered a high level document, which should provide a
+reason level of detail to guide your installations to a stable and
+secure state. Further documentation should be sought by the reader in
+key
+areas to provide detailed technical explanations.
+
+
+<br>
+
+<br>
+
+
+
+
+This document is developed around the <a href="http://fedora.redhat.com">Fedora Core versions of Linux</a>,
+so
+some configuration
+aspects will favour Fedora Core more than other
+Linux
+distributions. However, the configuration files, scripts and concepts
+are kept as generic as possible for the wider audience.<br>
+
+
+
+
+<br>
+
+
+
+
+<h2><a href="#top" name="assumptions"></a><a href="#top">Reader
+Assumptions</a></h2>
+
+
+
+
+I have tried to keep this HOWTO as simple as possible for all users to
+better understand the concepts and explanations herein. To fully
+utilise all configuration aspects like email and web server, I've made
+the following assumptions:<br>
+
+
+
+
+<ul>
+
+
+
+
+  <li>the reader has a basic
+understanding of the hierarchical
+structure of a Linux filesystem,</li>
+
+
+
+
+  <li>the reader understands the relationship of a server/client
+model
+and the services it provides,<br>
+
+
+
+
+  </li>
+
+
+
+
+  <li>the installer will not
+breach their Internet Service Provider's Acceptable Use Policy
+implementing this HOWTO,<br>
+
+
+
+
+  </li>
+
+
+
+
+  <li>a registered Internet Domain
+Name is available for use during the
+installation,</li>
+
+
+
+
+  <li>the reader can use a text
+editor (vim examples are used throughout
+HOWTO),</li>
+
+
+
+
+  <li>at least one dedicated
+computer will be used as the server
+(possibly more for a small to medium office environment), and<br>
+
+
+
+
+  </li>
+
+
+
+
+  <li>there is a full time
+broadband Internet connection available for use.</li>
+
+
+
+
+</ul>
+
+
+
+
+If users find the "vim" editor too difficult in manipulating the
+configuration files, then other text editors can be used instead like
+"gedit". Alternativley the "vim" GUI can be started by typing "gvim".
+<br>
+
+
+
+
+<br>
+
+
+
+
+<h2><a href="#top" name="feedback"></a><a href="#top">Providing
+Feedback</a></h2>
+
+
+
+
+This document covers a wide range of topics, while I have attempted to
+provide the best possible coverage on all these areas, some errors may
+occur or application settings change over time with updated releases.
+There are also numerous hyperlinks to external resources and sites
+which may break over time as these sites update or move.<br>
+
+
+
+
+<br>
+
+
+
+
+If you find any errors or omissions throughout the documentation, or
+perhaps have a better solution to possible problems, then please
+contact me so these changes may be incorporated into the document.<br>
+
+
+
+
+<br>
+
+
+
+
+Send all feedback and comments to: &nbsp; &nbsp;&nbsp; <a href="mailto:%22howto%20%28at%29%20brennan%20.%20id%20.%20au%22?subject=Linux%20Home%20Server%20HOWTO"><span style="font-weight: bold;">howto
+(at) brennan . id . au</span></a><br>
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+</span>
+<h2><a href="#top" name="conventions"></a><a href="#top">Document
+Conventions</a><br>
+
+
+
+
+</h2>
+
+
+
+
+This document uses the following textual conventions throughout the
+document as assistance
+to
+readers.<br>
+
+
+
+
+<br>
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="font-weight: bold; width: 335px;">Description<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-weight: bold;">Appearance<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Warning:
+Things that may affect stability </td>
+
+
+
+
+      <td style="vertical-align: middle;">
+      
+      
+      
+      <table style="text-align: left;" border="0">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!!" src="images/warning.gif"></td>
+
+
+
+
+            <td>This is a warning.<br>
+
+
+
+
+            </td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Caution:
+Things that are important<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>
+      
+      
+      
+      <table style="text-align: left;" border="0">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+            <td>This is a caution.</td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Hint: Things
+that may assist<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>
+      
+      
+      
+      <table style="text-align: left;" border="0">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+            <td>This is a hint.</td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Note: Things
+that may need remembering<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>
+      
+      
+      
+      <table style="text-align: left;" border="0">
+
+
+
+
+        <tbody>
+
+
+
+
+          <tr>
+
+
+
+
+            <td style="width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+            <td>This
+is a note.</td>
+
+
+
+
+          </tr>
+
+
+
+
+        
+        
+        
+        </tbody>
+      
+      
+      
+      </table>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+File Name<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">/etc/resolv.conf<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Directory
+Name<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">/var/log<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Typed
+Command<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td><span style="font-weight: bold; font-family: monospace;">rpm
+-ivh package.rpm</span><br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Application
+Name<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>ntpd<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Command
+Prompt - generic user<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">[bash]$<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Command
+Prompt - root user<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">[bash]#<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Command
+Prompt - generic user with tcsh
+shell<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">[tcsh]$<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Environment
+Variable<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td><span style="font-family: monospace;">VARIABLE</span><br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Emphasized
+Word<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>
+      
+      <em>emphasized</em>
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Quoted Text<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td>"quote"<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 335px;">&nbsp;-
+Configuration Example<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="background-color: rgb(204, 204, 204);"><code>workgroup
+= WORKGROUP<br>
+
+
+
+
+server
+string =&nbsp;Samba&nbsp;Server</code><br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+The following server and networking details are used throughout the
+configuration and script examples.<br>
+
+
+
+
+<br>
+
+
+
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="font-weight: bold; width: 335px;">Description<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-weight: bold;">Value<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Hostname:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="text-align: left; font-family: monospace;">galaxy<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Domain Name:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">example.com<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Fully
+Qualified Hostname:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">galaxy.example.com<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+USB Modem
+Interface<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">ppp0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(as applicable)<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+External Network Device:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">eth0
+&nbsp;
+&nbsp;&nbsp; (as applicable) </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Internal
+Network Device:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">eth1<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Internal IP
+Address:<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">192.168.1.1<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Subnet Mask<br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">255.255.255.0<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>&nbsp;-
+Private
+Network
+Address
+(Internal):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="font-family: monospace;">192.168.1.0/24<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+      <td>The above settings
+should be adjusted to suit the
+requirements of the individual and their networks. Where adjustments
+are
+changed, they should then be continued throughout the entire document
+for
+consistency.<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+<h2><a href="#top" name="thanks"></a><a href="#top">Acknowledgments
+and Thanks</a></h2>
+
+
+
+
+I first and foremost need to thank my wife Susan and our two children
+Caitlin and Lachlan for their support and understanding while I took
+time off to prepare this document. The majority of this HOWTO (the
+initial version for FC3) was
+written in a relatively short time, there was much to test and document
+to ensure that I presented you, the members of the Linux community,
+with what I hope is a quality resource. To my wife and family, I love
+you.<br>
+
+
+
+
+<br>
+
+
+
+
+I would also like to acknowledge the following people who helped me in
+certain areas of the document:<br>
+
+
+
+
+<br>
+
+
+
+
+1.&nbsp;&nbsp; Anyone ?<br>
+
+
+
+
+<br>
+
+
+
+
+<h2><a href="#top" name="copyright"></a><a href="#top">Copyright
+Notice</a></h2>
+
+
+
+
+<h3>&copy;
+2004, 2005 and 2006
+- Miles Brennan</h3>
+
+
+
+
+This documentation is licensed under the Creative Commons deed version
+2.5<br>
+
+
+<div style="text-align: left;" class="text">
+<b>Attribution-NonCommercial-ShareAlike 2.5 </b>
+
+
+<br>
+
+<strong></strong><br>
+
+<strong>You are free:</strong>
+
+
+<ul>
+
+
+
+
+  <li>to copy, distribute, display, and perform the work</li>
+
+
+
+
+  <li>to make derivative works</li>
+
+
+
+
+</ul>
+
+
+
+
+<strong>Under the following conditions:</strong>
+
+
+<table class="draft" border="0" cellpadding="4" cellspacing="0" width="500">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td> <img src="images/by.gif" alt="by" align="left" border="0" hspace="4"> </td>
+
+
+
+
+      <td align="left">
+      
+      
+      
+      <div class="tiny"><strong>Attribution</strong>.
+You must attribute the work in the manner specified by the author or
+licensor.</div>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td> <img src="images/nc.gif" alt="nc" align="left" border="0" hspace="4"> </td>
+
+
+
+
+      <td align="left">
+      
+      
+      
+      <div class="tiny"><strong>Noncommercial</strong>.
+You may not use this work for commercial purposes.</div>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+      <td> <img src="images/sa.gif" alt="sa" align="left" border="0" hspace="4"> </td>
+
+
+
+
+      <td align="left">
+      
+      
+      
+      <div class="tiny"><strong>Share Alike</strong>.
+If you alter, transform, or build upon this work, you may distribute
+the resulting work only under a license identical to this one.</div>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<ul>
+
+
+
+
+  <li>For any reuse or distribution, you must make clear to
+others the license terms of this work.</li>
+
+
+
+
+  <li>Any of these conditions can be waived if you get permission
+from the copyright holder.<strong></strong></li>
+
+
+
+
+</ul>
+
+
+
+
+<strong>Your
+fair use and other rights are in no way affected by the above.</strong><br>
+
+<strong>
+
+
+</strong>This is a human-readable summary of the
+<a href="http://creativecommons.org/licenses/by-nc-sa/2.5/legalcode" class="fulltext">Legal Code (the full license)</a>.<br>
+
+
+<br>
+
+
+
+
+</div>
+
+
+
+
+<h2><a href="#top" name="trademarks"></a><a href="#top">Registered
+Trademarks</a></h2>
+
+
+
+
+Linux is a registered trademark of Linus Torvalds.<br>
+
+
+
+
+The Fedora trademark is a trademark of Red Hat, Inc.<br>
+
+
+
+
+Motif and UNIX are registered trademarks of The Open Group.<br>
+
+
+
+
+Windows is a registered trademark of Microsoft Corporation.<br>
+
+
+
+
+SSH and Secure Shell are trademarks of SSH Communications Security, Inc.<br>
+
+
+
+
+All other trademarks and copyrights referred to are the property of
+their respective owners.
+
+
+<br>
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="index.html">Previous</a><br>
+
+
+
+
+      </td>
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="02-Planning_Considerations.html">Next</a><br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+</body>
+</html>

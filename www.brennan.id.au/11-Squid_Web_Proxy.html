@@ -1,0 +1,4823 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Squid Web Proxy</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="10-DHCP_Server.html">Previous</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="12-Sendmail_Server.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter
+11 - Squid Web Proxy<br>
+
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+
+
+      <td>- squid 2.5 STABLE 14</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+<a href="#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<a href="#starting">Starting
+The Server</a><br>
+
+
+
+
+
+
+
+<a href="#access">Setting
+Access Controls</a><br>
+
+
+
+
+
+
+
+<a href="#authenticate">Authenticating
+Users</a><br>
+
+<a href="#transparent">Configuring a Transparent Proxy</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <a href="http://www.squid-cache.org">Squid
+Web Proxy Cache</a> is
+a fully featured Internet caching server that handles all types of web
+requests on behalf of a user. When a user requests a web resource
+(webpage, movie clip, graphic, etc..), their request is sent to the
+caching server which then forwards the request to the real web server
+on
+their behalf. When the requested resource is returned to the caching
+server, it stores a copy of the resource in its "cache" and then
+forwards the request back to the original user. The next time someone
+requests a copy of the "cached" resource, it is delivered directly from
+the local proxy server and not from the distant web server (depending
+on age of resource etc..).<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Using a proxy server can greatly reduce web browsing speed if
+frequently visited sites and resources are stored locally in the cache.
+There are also financial savings to be gained if you're a large
+organisation with many Internet users or even a small home user that
+has a quota allowance for downloads. There are many ways a proxy can be
+beneficial to all networks.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The squid proxy has so many features, access controls and other
+configurable items, that it is impossible to cover all of the settings
+here. This chapter will provide some basic configuration settings
+(which is all thats required) to enable the server, and provide access
+controls to prevent unauthorised users from gaining access to the
+Internet through your proxy. The configuration file has been documented
+extremely well by the developers and should provide enough information
+to assist your set up, however if you don't know what a setting does,
+don't touch it.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="config"></a><a href="#top">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+Many Linux distributions provide Squid as part of their available
+packages and are already configured to some degree. The following
+settings are the more commonly used ones to enable and administer the
+service.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The configuration file for Squid is quite large which is mainly because
+of the detailed explanations through out and it is important that its
+backed up before we make any changes. If it all goes wrong theres
+only one thing that will save your sanity, a restored working config
+file.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/squid/squid.conf
+/etc/squid/squid.conf.original</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/squid/squid.conf</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">http_port</span>
+is the port
+number on the local server that Squid binds itself to and listens for
+incoming requests, its default port is <span style="font-family: monospace;">3128</span>
+but can be changed if
+needed (8080 is also a common cache port). Which ever port is used
+here,
+it will need to be set in all the workstations that will attach to and use the
+proxy; it can also be bound to only listen on the internal network IP
+address.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>#http_port 3128<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>#http_port
+192.168.1.1:3128<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">icp_port</span>
+is used to
+send Internet Cache Protocol (<a href="http://www.ietf.org/rfc/rfc2186.txt">RFC2186</a>)
+queries to
+neighbouring proxy
+servers. The default is port 3130, however unless you are using
+multiple
+proxys inside an organisation, its safe to disable (set to "0").<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>icp_port 0<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Some ISPs provide their customers with a proxy server to use, this
+provides benefits to both the user and ISP. If your ISP does has a
+proxy
+server, you can configure your own proxy to send all requests to the
+"upstream" server, this may provide a quicker return on your requests
+if the ISPs proxy has the requested objects stored in its cache. ICP is
+not required here, hence the "no-query" attribute.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>cache_peer
+proxy.myisp.com parent 3128 3130 no-query<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Squid's cache is designed to store cached objects from the Internet,
+however there may be a time that you don't want to store certain
+objects. The following settings tell the proxy not to store anything
+that was
+called through a cgi script.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl QUERY urlpath_regex
+cgi-bin \?<br>
+
+
+
+
+
+
+
+no_cache deny QUERY<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">cache_dir</span>
+tag
+specifies the location where the cache will reside in the filesystem. <span style="font-family: monospace;">ufs</span>
+identifies the storage
+format for the cache. The "<span style="font-family: monospace;">100"</span>
+specifies the maximum allowable size of the cache
+(in MB), and should be adjusted to suit your needs. The <span style="font-family: monospace;">16</span>
+and <span style="font-family: monospace;">256</span>
+specify the number1 of
+directories contained inside the first and second level cache store.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>cache_dir ufs
+/var/spool/squid 100 16 256<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+      <td>Squid does not have a
+cache store (the directories) when it
+is first installed and wont run without it. The cache store can be
+created by typing "<span style="font-family: monospace;">squid
+-z</span>"
+at the command prompt before starting the service for the first time.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following tags specify the standard log file locations.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>cache_access_log
+/var/log/squid/access.log<br>
+
+
+
+
+
+
+
+cache_log /var/log/squid/cache.log<br>
+
+
+
+
+
+
+
+cache_store_log /var/log/squid/store.log<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">log_fqdn</span>
+tag tells
+Squid to log the Fully Qualified Domain Name of the remote web server
+that it is getting the resources from, this is logged in the <span style="font-family: monospace;">cache_access_log</span>.
+This may slow
+the proxy slightly if it needs to do any external DNS queries, but may
+be required if the logs are to be analysed.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>log_fqdn off<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+When Squid proxies any FTP requests, this is the password used when
+logging in with an anonymous FTP account.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>ftp_user
+Squid@example.com<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">dns_nameservers</span>
+specifies which DNS should be queried for name
+resolution. Squid will normally use the values located in the <span style="font-family: monospace;">/etc/resolv.conf</span>
+file, but can
+be overridden here.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>dns_nameservers 127.0.0.1<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+If Squid dies, it will attempt to send an email to the <span style="font-family: monospace;">cache_mgr</span>.
+The <span style="font-family: monospace;">cache_mgr</span>'s
+email address is
+also displayed at the bottom of any error messages the proxy may
+display to the clients.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>cache_mgr
+admin@example.com<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+This is the name of the host server that is running the Squid service.
+It is also displayed at the bottom of any error messages the proxy may
+display to the clients.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>visible_hostname
+galaxy.example.com<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>The
+server is ready to be started, however no access has been granted at
+this point. The server is functional but inaccessible, see access
+controls to start using the proxy. The <span style="font-family: monospace;">localhost</span>
+will have access.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="starting"></a><a href="#top">Starting
+The Server</a></h2>
+
+
+
+
+
+
+
+Starting the proxy server is similar to any other service, set the
+appropriate runlevels that it should be active at, and then check to
+see if they are set correctly.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 345 squid on</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chkconfig
+--list squid</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+If this is the first time the Squid service has been started, or you
+have changed the <span style="font-family: monospace;">cache_dir</span>
+directive in some way, then the cache store needs to
+be (re)initialised. Squid may not start if this has not been done.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">squid -z</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The service can now be started, be sure to check the system log to see
+if any errors have occurred.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/squid
+restart</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">grep squid /var/log/messages</span> </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="access"></a><a href="#top">Setting
+Access Controls</a><br>
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+The initial access controls for the Squid server are fairly
+restrictive, with good reason too. Before anyone can use the
+server, the access controls must be written to allow access. Rules can
+be written for almost any type of requirement and can be very complex
+for large organisations, we will concentrate on some smaller home user
+types configurations.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The worst thing about configuring a proxy server for a site, is when
+the
+users can change their web browser details and just exit the firewall
+without even using it (naughty users !). With some simple restrictions
+set on the firewall, we can block any outgoing request to a web server
+that has not come through the proxy.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following <span style="font-family: monospace;">iptables</span>
+rule lists all of the <span style="font-family: monospace;">Safe_ports</span>
+(and common ports) that Squid allows, and blocks them if they came
+directly from any of the internal
+workstations. So the only outgoing requests could have come from the
+proxy running on the gateway. The computers on the internal network are
+still allowed to send requests to the gateway proxy. You may need to
+change
+this rule depending on your network topology.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace; font-weight: bold;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>iptables -I FORWARD -o
+ppp0 -s 192.168.1.0/24 -p tcp -m
+multiport \<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--dports
+21,23,70,80,81,82,210,280,443,488,563,591,777,3128,8080 -j DROP</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+      <td>A iptables multiport
+rule can only list up to 15 port numbers
+for each rule.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Now that all Internet browsing has been disabled, we need to allow
+access to the proxy server. You need to locate the following line in
+your
+configuration file, it is a placeholder telling you where you put your
+rules. If you put them anywhere else in the configuration file they may
+not work.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;"></span>[bash]# <span style="font-weight: bold;">vi /etc/squid/squid.conf</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td># INSERT YOUR OWN
+RULE(S) HERE TO ALLOW ACCESS FROM YOUR
+CLIENTS<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!" src="images/warning.gif"></td>
+
+
+
+
+
+
+
+      <td>Rules
+are tested in sequential order as they appear in the configuration
+file. Always check the order of your "http_access deny/allow" rules to
+ensure they
+are being enforced correctly.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To allow our internal network to have access to the proxy server,
+insert this rule. It defines an <span style="font-family: monospace;">ACL</span>
+called <span style="font-family: monospace;">INTERNAL</span>
+for all
+the
+<span style="font-family: monospace;">IP
+address</span> in the <span style="font-family: monospace;">source
+range</span> of <span style="font-family: monospace;">192.168.1.0/24</span>.
+It then allows <span style="font-family: monospace;">ACL
+INTERNAL</span> to have access.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+This is the minimum rule that you require to allow your users to access
+the cache. Further rules should be used to tighten the restrictions.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl INTERNAL src
+192.168.1.0/24<br>
+
+
+
+
+
+
+
+http_access allow INTERNAL<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+This rule defines an <span style="font-family: monospace;">ACL</span>
+called <span style="font-family: monospace;">BADPC</span>
+with a
+single <span style="font-family: monospace;">source
+IP</span> address
+of <span style="font-family: monospace;">192.168.1.25</span>.
+It then
+denies access to the <span style="font-family: monospace;">ACL</span>.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl BADPC src
+192.168.1.25<br>
+
+
+
+
+
+
+
+http_access deny BADPC<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following is a mixed rule, it uses two <span style="font-family: monospace;">ACLs</span>
+to deny access. This rule
+denies <span style="font-family: monospace;">KIDsPC</span>
+during an <span style="font-family: monospace;">ACL</span>
+called <span style="font-family: monospace;">CLEANTIME</span>
+which is in effect <span style="font-family: monospace;">Monday-Friday
+3-6PM</span>.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl KIDsPC src
+192.168.1.25<br>
+
+
+
+
+
+
+
+acl CLEANTIME MTWHF 15:00-18:00<br>
+
+
+
+
+
+
+
+http_access deny KIDsPC CLEANTIME<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+      <td>When more than one ACL
+is used in a deny/allow rule, they are
+processed with the "LOGICAL AND" function. So both ACLs must be true
+before the rule is enforced.<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The following two rules will block all files that end in the file
+extensions "<span style="font-family: monospace;">.mp3</span>"
+and "<span style="font-family: monospace;">.exe</span>"
+respectively. The "<span style="font-family: monospace;">-i</span>"
+means treat them as case
+insensitive which matches both upper and lower case.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl FILE_MP3
+urlpath_regex -i \.mp3$<br>
+
+
+
+
+
+
+
+http_access deny FILE_MP3</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl FILE_EXE
+urlpath_regex -i \.exe$<br>
+
+
+
+
+
+
+
+http_access deny FILE_EXE<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h3>Domain Blacklists</h3>
+
+
+
+
+
+
+
+Whether you're a system administrator for a large site or simply a
+parent running a home network, there may come a time where access to
+certain domains should be controlled or blocked, this can be easily
+accomplished by introducing a domain blacklist. A blacklist is just a
+file containing all of the domain names that are considered
+inappropriate for the internal users to access, and Squid is configured
+to check each request made to ensure it is not within the blacklist.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+There are several sites around the Internet that have updated
+blacklists available for you to download and use, these lists normally
+contain thousands of entries. Below are the details on how to
+create your own blacklist. Each entry located in the "<span style="font-family: monospace;">bad_domains</span>"
+file should be
+listed on a separate line. It is also important that only root and
+squid users have access to the list, otherwise users may change the
+contents.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+After the blacklist has been created, populated and secured, ensure
+that you place the appropriate "<span style="font-family: monospace;">BAD_DOMAINS</span>"
+access control policy in the configuration file.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/squid/bad_domains</span><br>
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+xxx<br>
+
+
+
+
+
+
+
+breast<br>
+
+
+
+
+
+
+
+.sex.com<br>
+
+
+
+
+
+
+
+.nasty.com<br>
+
+
+
+
+
+
+
+.naughty.com<br>
+
+
+
+
+
+
+
+.noclothes.com<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chown root.squid
+/etc/squid/bad_domains</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chmod 640 /etc/squid/bad_domains</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl BAD_DOMAINS
+dstdom_regex -i "/etc/squid/bad_domains"<br>
+
+
+
+
+
+
+
+http_access deny BAD_DOMAINS<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+      <td>Using regular
+expressions to match unwanted domain names may
+also block legitimate sites, such as "breast" blocking
+"www.breastcancer.com". Always check your entries to see if they may
+effect other domains, or use "<span style="font-family: monospace;">dstdomain</span>"
+instead of "<span style="font-family: monospace;">dstdom_regex</span>".<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Now that the proxy server has been configured to allow or deny access
+based on the access controls you have specified, its time to reload the
+configuration into Squid and test the controls.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/squid
+reload</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Remember, all the rules are tested in sequential order from the top,
+so putting the "<span style="font-family: monospace;">http_access
+allow
+INTERNAL</span>" ACL above the
+others will allow full access and no
+other rules would be
+tested. As a general rule, you should put any of your <span style="font-family: monospace;">DENY</span>
+rules before your <span style="font-family: monospace;">ALLOW</span>
+rules, if things aren't
+working exactly as you expected, check the order of your rules.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a name="authenticate"></a><a href="#top">Authenticating
+Users</a><br>
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+Further security can be maintained over your Internet access by firstly
+authenticating valid users before their access is granted. Squid can be
+told to check for valid users by looking up their username and password
+details in a common text file. The password values located inside the
+valid user list are subject to a hashing function, so they can not be
+compromised by someone reading the file "over your shoulder" (social
+engineering).<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The password file can be created using the following commands.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">touch
+/etc/squid/passwd</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chown root.squid /etc/squid/passwd</span><br>
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chmod 640 /etc/squid/passwd </span></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+      <td>The username and
+password pairs located in the "passwd" file
+could be subject to a brute force attack. Ensure that only root and
+squid users have access to this file (hence the "chmod").<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To add users to the password list, use the <span style="font-family: monospace;">htpasswd</span>
+application, you will
+then be prompted to enter a password for the username. If you are
+setting up user access
+for an organisation, always allow the user to type their own password
+here, this stops the user blaming an administrator from using their
+account if problems arise.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">htpasswd
+/etc/squid/passwd username</span> </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The configuration file now needs to be adjusted so it checks for valid
+users. Locate the "<span style="font-family: monospace;">INTERNAL</span>"
+access control statement you used eariler, and make the following
+changes. This set of rules will now only allow users that have been
+authenticated and are located inside your private network.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>acl INTERNAL src
+192.168.1.0/24<br>
+
+
+
+
+
+
+
+acl AUTHUSERS proxy_auth REQUIRED<br>
+
+
+
+
+
+
+
+http_access allow INTERNAL AUTHUSERS<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The final configuration required is to tell Squid how to handle the
+authentication. These listings are already in the configuration file
+and need to be adjusted to suit your requirements.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>auth_param basic program
+/usr/lib/squid/ncsa_auth
+/etc/squid/passwd<br>
+
+
+
+
+
+
+
+auth_param basic children 5<br>
+
+
+
+
+
+
+
+auth_param basic realm Squid - Home Proxy Server<br>
+
+
+
+
+
+
+
+auth_param basic credentialsttl 2 hours<br>
+
+
+
+
+
+
+
+auth_param basic casesensitive off<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Its time to reload Squids configuration and test it; good luck.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/squid
+reload</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+<h2><a name="transparent"></a><a href="#top">Configuring a Transparent Proxy</a></h2>
+
+Now that you have successfully configured your Squid proxy server, you
+will need to configure all of your workstations on your internal
+network to be able to use it; this may seem like a lengthy task
+depending on how big your internal network is. It also means that you
+will need to manually configure all of your applications that connect
+to remote web servers for information / data exchange, this includes
+all web browsers, virus update applications and other such utilities.
+Hmm, this could take a while.<br>
+
+<br>
+
+One great feature of Squid is that is can be used as a HTTPD
+accelerator, and when configured in conjunction with an iptables
+redirect rule, it will become transparent to your network. Why? because
+we will no longer need to setup all of our applications on our
+workstations to use the proxy, now we can redirect all HTTP requests as
+they come through our firewall to use our transparent proxy instead;
+easier administration.<br>
+
+<br>
+
+An important point before proceeding, transparent proxies CAN NOT be
+used for HTTPS connections over SSL (Port 443). This would break the
+server to client SSL connection dependant upon your security and
+confidentiality of the protocol, it could also allow a "man in the
+middle" attack because of captured (proxied) packets.<br>
+
+<br>
+
+To continue, make the following changes to your Squid configuration file.<br>
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;"></span>[bash]# <span style="font-weight: bold;">vi /etc/squid/squid.conf</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <tr>
+
+      <td>
+      httpd_accel_host virtual<br>
+httpd_accel_port 80<br>
+httpd_accel_with_proxy  on<br>
+httpd_accel_uses_host_header on
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+The following rule is written for our firewall script as detailed in
+Chapter 6. The rule directs all packets from the internal LAN address
+to the proxy server's active "http_port" address (default is 3128).
+Once the proxy server has the packet it will be processed and returned
+to the client as normal, the client won't even know.<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;"></span>[bash]# <span style="font-weight: bold;">vi /root/firewall.sh</span><span style="font-weight: bold;"></span>
+
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <tr>
+
+
+
+
+
+
+
+
+
+
+
+
+      <td># Redirect all WWW (port 80) OUTBOUNT packets to the Squid Server on port&nbsp;3128<br>
+
+iptables -t nat -A PREROUTING -i $INT_DEV -s $INT_NET -p tcp --dport 80&nbsp; -j REDIRECT --to-port 3128<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <span style="font-weight: bold;"></span></td>
+
+
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <tr>
+
+      <td><span style="font-weight: bold;"></span>[bash]#&nbsp;<span style="font-weight: bold;">/root/firewall.sh</span></td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+Once the Squid configuration has been adjusted, it needs to be reloaded before it will be available.<br>
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/squid
+reload</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+To test if the transparent proxy is functioning correctly, type the
+following command at a command prompt and watch for any clients using
+the Internet; you should see Squid access requests being logged to the
+screen.<br>
+
+<br>
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">tail -f /var/log/squid/access.log</span><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+Further information regarding Squid transparent proxies can be found in the <a href="http://www.squid-cache.org/Doc/FAQ/FAQ-17.html">Squid FAQ</a>.<br>
+
+<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="10-DHCP_Server.html">Previous</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="12-Sendmail_Server.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+</body>
+</html>

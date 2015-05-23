@@ -1,0 +1,9670 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Firewall Concepts</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="05-Broadband_Connectivity.html">Previous</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="07-Package_Management.html">Next</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 6 - Firewall Concepts<br>
+
+
+
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+
+
+
+<a href="#forwarding"><span style="color: rgb(255, 0, 0);"></span>
+Packet Forwarding</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#filtering">Packet
+Filtering</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#nat">Network
+Address Translation</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#snat">Source
+NAT</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#masquerading">IP
+Masquerading</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#dnat">Destination
+NAT</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#examplescript">Example
+Firewall Script</a><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold; color: rgb(255, 0, 0);"></span><br>
+<span style="font-weight: bold; color: rgb(255, 0, 0);">
+
+
+
+
+
+
+
+
+</span>With all the possible
+security threats roaming around the
+Internet
+today, a security firewall should be considered a mandatory necessity
+for any computer systems connected to the Internet. A firewall is a
+networking device which is used to separate private networks from
+external access by providing a certain level of security rules and
+controls.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+A simple firewall can be configured to block all access to certain
+networks, workstations and communication ports. A more complex firewall
+is capable of inspecting each individual packet that attempts to pass
+through it and ensures that they are correctly formatted and
+appropriate to the services provided for (or by) the internal network,
+this is called a packet filtering firewall.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+This chapter will explain some of the concepts for <span style="font-family: monospace;">iptables</span>
+and packet forwarding
+which can be used to secure your private network. The example
+configurations provided in each section are only designed to provide an
+introduction into each of those specific sections, while an
+example firewall script has been included which will provide simple but
+effective
+security for your networked system.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+
+      <td>Many of the newer
+broadband modems provide built-in firewall
+features that allow for stateful packet inspection and detailed network
+address translations, which are capable of providing a high security
+level for your internal network.<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="forwarding"></a><a href="#top">Packet
+Forwarding</a><br>
+
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+
+Packet forwarding is a simple concept where the server allows data
+packets to pass from one network to another. As with the diagram below,
+packets from the private network are allowed to be forwarded through
+the server and out to the ISP and vice versa.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</span><span style="font-family: monospace;">                            </span><span style="font-family: monospace;">                            /-----------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; /-----------------\ &nbsp;&nbsp; &nbsp; | &nbsp; Server
+(Routing) &nbsp;&nbsp; | &nbsp; &nbsp; &nbsp;/-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; | Private Network |------|&nbsp; eth1 : 192.168.1.1 &nbsp;
+| &nbsp; &nbsp;&nbsp; | ISP Connection &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; | 192.168.1.0/24 &nbsp;| &nbsp; &nbsp;&nbsp;
+|-----------------------| &nbsp; &nbsp;&nbsp; | REMOTE IP ADDR &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; \-----------------/ &nbsp; &nbsp;&nbsp; | eth0 :
+123.123.123.2&nbsp; |------| 123.123.123.1 &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;\-----------------------/ &nbsp;
+&nbsp;&nbsp; \-----------------/</span><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+There are a few initial considerations. First, the server must have
+networks or
+gateways defined in its routing table so it can make an informed
+decision where the packet needs to be passed to. Second, the server
+must have packet forwarding enabled. Thirdly, if the routed packets
+came from an <a href="http://www.ietf.org/rfc/rfc1918.txt">RFC1918</a>
+private subnet, they must be translated into globally routed IP
+addresses (NAT covered later) before they will be accepted out on the
+Internet.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Packet forwarding can be enabled either manually as required by the
+superuser, or automatically when the system starts the networking
+service. To manually enable or disable packet forwarding, use the
+respective commands listed below.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">echo 1 &gt;
+/proc/sys/net/ipv4/ip_forward</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">echo 0 &gt;
+/proc/sys/net/ipv4/ip_forward</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To enable automatic packet forwarding for whenever the network service
+is active, make the following changes in your <span style="font-family: monospace;">/etc/sysctl.conf</span>
+file.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/sysctl.conf</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>net.ipv4.ip_forward = 1<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+
+      <td>It is common practice
+for users to have manual control over packet
+forwarding, and to active or disable the function within their firewall
+control scripts. However setting packet forwarding to start
+automatically will be more suitable for a dedicated server.<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="filtering"></a><a href="#top">Packet
+Filtering</a><br>
+
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+
+Packet filtering is also a reasonably simple concept (true), however it
+can be very daunting for new users that don't fully understand how it
+works, so let's cover the basics first and build it up.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+In packet forwarding the kernel is either allowed to move packets
+between different subnets or is not, and if it is, the decisions are
+made from the kernel's routing table. In packet filtering an
+application called <span style="font-family: monospace;">iptables</span>
+(<a href="http://www.netfilter.org">www.netfilter.org</a>)
+stores a list of programmed rules which are individually tested against
+every packet that either tries to enter, pass through, or exit any of
+the system's network devices. Each rule is used to test the packet in a
+sequential order and if the packet matches any of the rules it is
+either accepted or rejected depending on the global policy and rule
+definitions. <span style="font-family: monospace;">iptables</span>
+is your firewall application and is one of the networking frameworks
+for your Linux kernel.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;">iptables</span>
+essentially has this name because it stores the rulesets into a group
+of three tables which each provide different capabilities depending on
+the rules and the order they are applied. We will only examine the
+<span style="font-family: monospace;">filter</span>
+and <span style="font-family: monospace;">nat</span>
+tables here, the <span style="font-family: monospace;">mangle</span>
+table is used for
+specialised
+packet alteration which is beyond our scope. The following table
+displays the <span style="font-family: monospace;">filter</span>
+iptables and the three built-in chains.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 150px;">Table
+Name<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 150px;">Chain
+Name<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Chain
+Details<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;" colspan="1" rowspan="3">filter<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">INPUT<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For any packet coming
+into the system<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">FORWARD<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For any packet that is
+being routed through the system<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">OUTPUT<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For any packet that is
+leaving the system<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To list the <span style="font-family: monospace;">filter</span>
+table and its rules you can use the following command.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">iptables -t
+filter -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">filter</span>
+table is the default table when working with <span style="font-family: monospace;">iptables</span>,
+so there is no need to add '<span style="font-family: monospace;">-t
+filter</span>' at the command prompt.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">iptables -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>Chain INPUT (policy
+ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination&nbsp;<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+You should see an output similar to above, if not then stop the
+iptables service and output the table again. From the listing you can
+see the three built in chains, and their default policies are all set
+to <span style="font-family: monospace;">ACCEPT</span>,
+which means
+the firewall is inactive.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/iptables
+stop</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+The output from the top listing does not provide much information, so
+let's populate the table with some of our own rules. Type the following
+commands at the prompt then output a listing of the table again.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01- [bash]# <span style="font-weight: bold;">iptables -P
+INPUT DROP</span><br>
+
+
+
+
+
+
+
+
+
+02- [bash]# <span style="font-weight: bold;">iptables -P FORWARD DROP</span><br>
+
+
+
+
+
+
+
+
+
+03- [bash]# <span style="font-weight: bold;">iptables -P OUTPUT DROP</span><br>
+
+
+
+
+
+
+
+
+
+04- [bash]# <span style="font-weight: bold;">iptables -A INPUT&nbsp; -i lo -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+05- [bash]# <span style="font-weight: bold;">iptables -A OUTPUT -o lo -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+06- [bash]# <span style="font-weight: bold;">iptables -A INPUT&nbsp; -i ppp0 -p tcp --sport 80 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+07- [bash]# <span style="font-weight: bold;">iptables -A OUTPUT -o ppp0 -p tcp --dport 80 -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+08- [bash]# <span style="font-weight: bold;">iptables -A INPUT&nbsp; -i eth1 -s 192.168.1.0/24 -p
+tcp
+--dport 3128 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+09- [bash]# <span style="font-weight: bold;">iptables -A OUTPUT -o eth1 -d 192.168.1.0/24 -p tcp --sport
+3128 -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 20px;">01-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+04-<br>
+
+
+
+
+
+
+
+
+
+06-<br>
+
+
+
+
+
+
+
+
+
+08-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+02-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+03-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+05-<br>
+
+
+
+
+
+
+
+
+
+07-<br>
+
+
+
+
+
+
+
+
+
+09-<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>Chain INPUT (policy DROP
+0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;
+--&nbsp; lo&nbsp;&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; ppp0&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp spt:80<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; eth1 &nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp dpt:3128<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;
+--&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp dpt:80<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+eth1 &nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp spt:3128<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+The nine commands which you typed above have been numbered along with
+their output so they can be easily identified in the second table.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+01-03:</span> The first three
+commands set the default (<span style="font-family: monospace;">-P</span>)
+policy on all the chains to <span style="font-family: monospace;">DROP</span>
+everything, unless suitable rules inside the chain will <span style="font-family: monospace;">ACCEPT</span>
+them. This is the most
+secure method of filtering as any packet that is now to pass through
+any of the chains, must have a specific rule written for it.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+04-05:</span> These two commands
+have (<span style="font-family: monospace;">-A</span>)
+appended two <span style="font-family: monospace;">ACCEPT</span>
+rules. The <span style="font-family: monospace;">OUTPUT</span>
+rule (05) allows any
+packet to (<span style="font-family: monospace;">-o</span>)
+leave via
+the loopback device and the <span style="font-family: monospace;">INPUT</span>
+rule (04) allows packets to re-enter (<span style="font-family: monospace;">-i</span>)
+via the loopback.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Because the chains are using a default <span style="font-family: monospace;">DROP</span>
+policy, they restrict the
+server from accessing any of its own services running on the local
+host, like DNS. A basic rule like this allows the server to access all
+loopback services without restriction.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+06-07:</span> The next two (<span style="font-family: monospace;">-A</span>)
+appended rules are more
+specific, lets look at the outbound one first. The <span style="font-family: monospace;">OUTPUT</span>
+rule (07) specifies that
+any packet going out the (<span style="font-family: monospace;">-o</span>)
+ppp0 interface using (<span style="font-family: monospace;">-p</span>)
+protocol <span style="font-family: monospace;">TCP</span>
+is <span style="font-family: monospace;">ACCEPT</span>ed
+if its going to <span style="font-family: monospace;">port
+80</span>. The <span style="font-family: monospace;">INPUT</span>
+rule (06) specifies that
+any packet coming in the (<span style="font-family: monospace;">-i</span>)
+ppp0 interface using (<span style="font-family: monospace;">-p</span>)
+protocol <span style="font-family: monospace;">TCP</span>
+is <span style="font-family: monospace;">ACCEPT</span>ed
+if its coming from <span style="font-family: monospace;">port
+80</span>.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+You should be able to pick this up, it says that we are allowed to
+access external web servers from our own server, but there are no
+forward rules for the internal network to surf the Internet. We should
+also allow
+our
+internal network the ability to access external web servers too
+shouldn't we? Let's look at the next rules then.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+08-09:</span> The last <span style="font-family: monospace;">INPUT</span>
+rule (08) which has been (<span style="font-family: monospace;">-A</span>)
+appended to the chain
+allows any packets from the (<span style="font-family: monospace;">-s</span>)
+source network of <span style="font-family: monospace;">192.168.1.0/24</span>
+if they enter through the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">eth1</span>
+device and if they
+are the <span style="font-family: monospace;">TCP</span>
+(<span style="font-family: monospace;">-p</span>)
+protocol and are going to
+the (<span style="font-family: monospace;">--dport</span>)
+destination
+port of <span style="font-family: monospace;">3128</span>.&nbsp;
+The
+matching <span style="font-family: monospace;">OUTPUT</span>
+rule (09)
+has been (<span style="font-family: monospace;">-A</span>)
+appended to
+the chain and allows any packets that are going out (<span style="font-family: monospace;">-o</span>)
+the <span style="font-family: monospace;">eth1</span>
+interface to (<span style="font-family: monospace;">-d</span>)
+destination network <span style="font-family: monospace;">192.168.1.0/24</span>
+using the <span style="font-family: monospace;">TCP</span>
+(<span style="font-family: monospace;">-p</span>)
+protocol if it came from
+the (<span style="font-family: monospace;">--sport</span>)
+source port
+of <span style="font-family: monospace;">3128</span>.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+These two are fairly detailed rules, they say that anyone on the
+internal
+network (192.168.1.0/24) is allowed to send packets to the squid proxy
+server (3128) through the internal eth1 interface and the results can
+be returned to the workstation.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+If you use a strict <span style="font-family: monospace;">DROP</span>
+policy like above, its important to note that you may need two rules
+that complement each other in order for data to flow out and back in
+again.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h3>A Walk Through</h3>
+
+
+
+
+
+
+
+
+
+To better understand the above filtering example, its best to walk the
+configuration through the same way a packet would be subject to the
+filtering table's definitions, one rule at a time. Remember, every
+packet
+of data has certain attributes, source/destination addresses,
+source/destination ports, the interfaces they are coming in and out and
+the type of protocol being used, the filtering will reject any packet
+whose attributes dont match any of the rules in our chains.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+A person using the workstation (in the network example below) wishes to
+access the resources of the web server located on the Internet, can a
+direct connection be established? No, all the policies are set to <span style="font-family: monospace;">DROP</span>
+and there is no <span style="font-family: monospace;">FORWARD</span>
+rules defined, so it
+simply can not occur.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Can the proxy server access the web server on the Internet? Yes, the
+proxy server has the rights to access anything which is TCP based
+operating at
+port 80 out through the ppp0 link, which is to a web server. Can you
+see the <span style="font-family: monospace;">ACCEPT</span>
+rules for
+the packet's
+attributes in the complementing <span style="font-family: monospace;">INPUT</span>
+and <span style="font-family: monospace;">OUTPUT</span>
+chains?<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</span><span style="font-family: monospace;">                            </span><span style="font-family: monospace;">                            /-----------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; /-----------------\ &nbsp;&nbsp; &nbsp; |&nbsp; Proxy
+Server (3128)&nbsp; | &nbsp;&nbsp; &nbsp; /---------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; | &nbsp; Workstation &nbsp; |------| &nbsp;eth1 :
+192.168.1.1 &nbsp; | &nbsp; &nbsp; &nbsp;|&nbsp; Web Server &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; | &nbsp; 192.168.1.10 &nbsp;| &nbsp; &nbsp;&nbsp; | &nbsp;ppp0 :
+123.123.123.2 |------| (TCP port 80) |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; \-----------------/ &nbsp; &nbsp;&nbsp; | &nbsp; &nbsp;lo :
+127.0.0.1 &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;\---------------/</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;\-----------------------/</span><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The only way now for the workstation to access anything, is via the
+proxy server application running at port 3128, which in turn can access
+any web server resources on the Internet and return the requested
+information to the workstation. Are the required rules in the table?<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+How does this work without any forwarding rules? Easy, the
+proxy server is an application that requests resources on behalf of a
+client, so the request comes into the proxy from the client, and now
+the
+request goes out to the web server from the proxy, as though it was
+requesting the information itself. This happens at the application
+layer,
+because its the proxy application which forwards the clients original
+request, so
+forwarding at the IP layer is not required here.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Hopefully you have been able to pick up the filtering concepts
+mentioned above, if you have, well done. The proxy server situation was
+a little tricky, but was introduced to give you an understanding that
+particular packets and resources can still be shaped to suit your
+security requirements by incorporating them into your network design.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Thats a brief introduction to packet filtering, the ability to write
+and chain together rules that selectively accept or deny any packets
+that do not meet the security requirements for your network.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+What happens to the filter table when you type these following
+commands? View the
+table's output after each one and see if you can recognise the effects
+of the rules, and which direction the packets can pass (i.e., are they
+going to an internal or external resource). View "<span style="font-weight: bold; font-family: monospace;">man iptables</span>" for further assistance.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">iptables -I
+INPUT&nbsp; 2 -i ppp0 -p tcp --dport ftp
+-j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -I OUTPUT 2 -o ppp0 -p tcp --sport ftp -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -D INPUT&nbsp; -i ppp0 -p tcp --sport 80 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -D OUTPUT -o ppp0 -p tcp --dport 80 -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -A INPUT&nbsp; -p icmp --icmp-type any -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -A OUTPUT -p icmp --icmp-type any -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -I INPUT&nbsp; -m state --state INVALID -j LOG
+--log-prefix "INVALID Input: "</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# i<span style="font-weight: bold;">ptables -I INPUT&nbsp; -m state --state INVALID -j DROP</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -F</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">/etc/init.d/iptables restart</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="nat"></a><a href="#top">Network
+Address Translation</a><br>
+
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+
+Network Address Translation (NAT) is the ability to change a data
+packets destination or source IP address on-the-fly, so the packet
+looks like it came from (or is going to) a different address than the
+original (also works on port numbers).<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+There are many reasons why we should use NAT, here are a few:<br>
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+
+  <li>Frees the requirement to use
+large amounts of 'real' IP addresses
+(cheaper),<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>Allows packets from a
+private (<a href="http://www.ietf.org/rfc/rfc1918.txt">RFC1918</a>)
+network to be
+globally routed out to the Internet,<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>Allows packets on the
+Internet to be routed into a private (<a href="http://www.ietf.org/rfc/rfc1918.txt">RFC1918</a>)
+network,</li>
+
+
+
+
+
+
+
+
+
+  <li>It masks the true amount of
+private workstations, as all external
+traffic appears to come from the one source,<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>It allows inbound traffic to
+be sent to different internal hosts
+(bastions) depending on the resources requested, and<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>It does not disclose any
+security details of the internal private
+network.</li>
+
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+The <span style="font-family: monospace;">iptables</span>
+package also
+provides support for NAT and has a built-in <span style="font-family: monospace;">nat</span>
+table just for that
+purpose. Below is a listing of the default chains that are found in the
+<span style="font-family: monospace;">nat</span>
+table and an
+explanation of how they are applied.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 150px;">Table
+Name<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 150px;">Chain
+Name<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Chain
+Details<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;" colspan="1" rowspan="3">nat<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">PREROUTING<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For altering packets as
+they are entering the system (before filter INPUT)<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">POSTROUTING<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For altering packets as
+they are exiting the system (after filter OUTPUT)<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 150px; font-family: monospace;">OUTPUT<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>For altering&nbsp;
+packets before leaving the local system (before the routing table) <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+As the naming suggests, the <span style="font-family: monospace;">PREROUTING</span>
+and <span style="font-family: monospace;">POSTROUTING</span>
+chains
+are applied before or after any kernel routing decisions are made, so
+the packets can then be routed to match any new changes which have been
+made to the
+destination or source addresses.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To list the contents of the <span style="font-family: monospace;">nat</span>
+table, issue the following command at the prompt.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">iptables -t nat
+-nvL</span> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="snat"></a><a href="#top">Source NAT</a><br>
+
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+
+Source NAT deals with changing the source address of any packets that
+pass through the NAT device, assuming they meet the criteria of the
+specified policies and chains. This allows workstations on a private
+network to send data packets through the NAT device which changes the
+source address in the packet's header before sending the packet onto
+the Internet. When the packet reaches its
+destination and is processed, the distant host returns the packet using
+the adjusted address as the new destination address, and delivers it
+back to the NAT device. The NAT device stores a list in memory of all
+the packets it adjusts, so when they are returned, the packets can be
+redirected to the real originator of the packets on the internal
+private network.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Source NAT can be written for inbound and outbound packets, but are
+more commonly used for outbound.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+For a packet to be subject to SNAT, lets consider the following details:<br>
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+
+  <li>The packet has meet at least
+one rule in all three <span style="font-family: monospace;">filter</span>
+chains (<span style="font-family: monospace;">INPUT,
+FORWARD, OUTPUT</span>),</li>
+
+
+
+
+
+
+
+
+
+  <li>The packet has been checked
+against the kernel routing table, and
+a decision on where to route has been made,<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>As the packet leaves the NAT
+device, the source address is
+changed to the NATs external IP address,</li>
+
+
+
+
+
+
+
+
+
+  <li>The NAT device remembers the
+real owner of the packet.<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+It all sounds rather confusing, so lets go straight to an example. Type
+the following rules at the command prompt and then display the
+contents of the <span style="font-family: monospace;">filter</span>
+and <span style="font-family: monospace;">nat</span>
+tables with the
+last command (typed as one line).<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01- [bash]# <span style="font-weight: bold;">iptables -P
+INPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+02- [bash]# <span style="font-weight: bold;">iptables -P FORWARD DROP</span><br>
+
+
+
+
+
+
+
+
+
+03- [bash]# <span style="font-weight: bold;">iptables -P OUTPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+04- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i eth1 -o ppp0 -s 192.168.1.0/24 -p
+tcp --dport 80 -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+05- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i ppp0 -o eth1 -d 192.168.1.0/24 -p
+tcp --sport 80 -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+06- [bash]# <span style="font-weight: bold;">iptables -t nat -A POSTROUTING -o ppp0 -s 192.168.1.0/24 -j
+SNAT --to-source 123.123.123.2</span><br>
+
+
+
+
+
+
+
+
+
+07- [bash]# <span style="font-weight: bold;">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -nvL ; iptables -t nat -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+02-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+04-<br>
+
+
+
+
+
+
+
+
+
+05-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+03-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+06-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>Chain INPUT (policy
+ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; eth1 &nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp dpt:80<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; ppp0&nbsp;&nbsp;
+eth1 &nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tcp
+spt:80<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+SNAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+all&nbsp; --&nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+to:123.123.123.2<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+01-03:</span> The first three
+commands have now defined the global policies for the three built-in
+chains for the <span style="font-family: monospace;">filter</span>
+table.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To keep the example a little easier to understand, we are going to
+accept everything that is classed as <span style="font-family: monospace;">INPUT</span>
+or <span style="font-family: monospace;">OUTPUT</span>,
+and for security we are
+dropping anything trying to pass through (<span style="font-family: monospace;">FORWARD</span>)
+the NAT unless we
+allow it.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+04-05:</span> The two forward
+rules are quite specific. Rule 04 says that any packet that comes in (<span style="font-family: monospace;">-i</span>)
+the <span style="font-family: monospace;">eth1</span>
+interface and goes (<span style="font-family: monospace;">-o</span>)
+out the <span style="font-family: monospace;">ppp0</span>
+device from the (<span style="font-family: monospace;">-s</span>)
+source network of <span style="font-family: monospace;">192.168.1.0/24</span>
+can be <span style="font-family: monospace;">ACCEPT</span>ed
+if its going to (<span style="font-family: monospace;">--dport</span>)
+destination port <span style="font-family: monospace;">80</span>;
+a web server. Rule 05 is
+the matching rule allowing the packet to return back through the NAT.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+We don't have any <span style="font-family: monospace;">INPUT</span>
+or <span style="font-family: monospace;">OUTPUT</span>
+restrictions
+here, so we only need to write
+and match rules that allow packets to pass through (<span style="font-family: monospace;">FORWARD</span>)
+the NAT. In the
+diagram below, when a HTTP(80) request comes from the private network,
+it is allowed to pass through the NAT and continue to the web server
+out on the Internet. But what are the packet's attributes? Its source
+address is still 192.168.1.x, so when it reaches its destination, the
+web
+server does not know where it came from because its a private
+non-routable <a href="http://www.ietf.org/rfc/rfc1918.txt">RFC1918</a>
+IP
+address, so the server will probably just drop it. No packets will ever
+be
+returned.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</span><span style="font-family: monospace;">                            </span><span style="font-family: monospace;">                            /-----------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; /-----------------\ &nbsp; &nbsp;&nbsp; | &nbsp;NAT
+Gateway Device &nbsp; | &nbsp;&nbsp; &nbsp; /---------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; | Private Network |------| &nbsp;eth1 : 192.168.1.1 &nbsp; |
+&nbsp; &nbsp;&nbsp; | &nbsp;Web Server &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; | 192.168.1.0/24&nbsp; | &nbsp; &nbsp;&nbsp; | &nbsp;ppp0 :
+123.123.123.2 |------| (TCP port 80) |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; \-----------------/ &nbsp; &nbsp;
+&nbsp;\-----------------------/ &nbsp; &nbsp; &nbsp;\---------------/</span><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+<span style="font-weight: bold;">
+
+
+
+
+
+
+
+
+Line 06:</span> This rule is our
+solution to the above problem. This
+rule is applied after the routing decisions have been made and the
+packet is about to depart for the web server out on the Internet. It
+says, any packet that goes (<span style="font-family: monospace;">-o</span>)
+out the <span style="font-family: monospace;">ppp0</span>
+interface
+from the (<span style="font-family: monospace;">-s</span>)
+<span style="font-family: monospace;">192.168.1.0/24</span>
+network is to
+have the source address rewritten as <span style="font-family: monospace;">123.123.123.2</span>.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Now when the packet reaches the Internet web server, it can be
+processed normally and returned to <span style="font-family: monospace;">123.123.123.2</span>
+(the NAT device),
+where it will automatically be rewritten again and sent back to the
+original
+workstation on the internal private network.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+07:</span> This command tells the
+kernel that it is allowed to forward packets between any of its network
+devices. These packets are still subject to the iptables rulesets.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Some important points about SNAT to remember are:<br>
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+
+  <li>SNAT is used in the <span style="font-family: monospace;">POSTROUTING</span>
+chain after the kernel routing decisions have been made,</li>
+
+
+
+
+
+
+
+
+
+  <li>Forwarding rules need to be
+suitable to allow packets in both
+directions,<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>The "<span style="font-family: monospace;">--to-source</span>"
+address should be the external IP address which will be visible on
+the packets return, and<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>SNAT should not be used for
+dynamic links where the IP address is
+likely to change (see
+masquerading, next).</li>
+
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="masquerading"></a><a href="#top">IP
+Masquerading</a><br>
+
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+
+Put simply, masquerading is a form of SNAT which should be used for all
+dynamic interfaces where the IP address is likely to be different each
+time we connect. This is perfect for our dynamic IP broadband accounts,
+and saves having to rewrite large SNAT rules each time we connect to
+the Internet. SNAT remembers connection state information (to a degree)
+if a static connection was to drop, however using masquerading the
+connection state information is reset each time the interface is
+(de)activated. Masquerading automates SNAT for dynamic IP connections.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Because masquerading is so easy (true) we are going to use some state
+tracking attributes in our rules. Type the following rules at the
+command prompt and display a listing of the <span style="font-family: monospace;">filter</span>
+and <span style="font-family: monospace;">nat</span>
+tables.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01- [bash]# <span style="font-weight: bold;">iptables -P
+INPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+02- [bash]# <span style="font-weight: bold;">iptables -P FORWARD DROP</span><br>
+
+
+
+
+
+
+
+
+
+03- [bash]# <span style="font-weight: bold;">iptables -P OUTPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+04- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i ppp0 -m state --state
+ESTABLISHED,RELATED -j ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+05- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i eth1 -o ppp0 -s 192.168.1.0/24 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+06- [bash]# <span style="font-weight: bold;">iptables -t nat -A POSTROUTING -o ppp0 -s 192.168.1.0/24 -j
+MASQUERADE</span><br>
+
+
+
+
+
+
+
+
+
+07- [bash]# <span style="font-weight: bold;">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -nvL ; iptables -t nat -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+02-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+04-<br>
+
+
+
+
+
+
+
+
+
+05-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+03-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+06-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>Chain INPUT (policy
+ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;
+--&nbsp; ppp0&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+state RELATED,ESTABLISHED<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; eth1 &nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0 MASQUERADE all&nbsp;
+--&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+01-03:</span> The first three
+commands have now defined the global policies for the three built-in
+chains for the <span style="font-family: monospace;">filter</span>
+table.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To keep the example a little easier to understand, we are going to
+accept everything that is classed as <span style="font-family: monospace;">INPUT</span>
+or <span style="font-family: monospace;">OUTPUT</span>,
+and for security we are
+dropping anything trying to pass through (<span style="font-family: monospace;">FORWARD</span>)
+the NAT unless we
+explicitly
+allow it.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+04:</span> Rule 04 deals with the
+connection state and says, any packet that comes in the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">ppp0</span>
+interface must (<span style="font-family: monospace;">-m</span>)
+<span style="font-family: monospace;">match</span>
+a certain <span style="font-family: monospace;">state</span>,
+and the <span style="font-family: monospace;">state</span>
+must ensure the packet is
+in response to an already <span style="font-family: monospace;">RELATED</span>
+or <span style="font-family: monospace;">ESTABLISHED</span>
+connection.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Basically only allow packets to be forwarded into the private network
+if the packet is in response to an already <span style="font-family: monospace;">RELATED</span>
+or <span style="font-family: monospace;">ESTABLISH</span>
+connection. This rule
+will not allow any <span style="font-family: monospace;">NEW</span>
+connections to be initiated from the external network a connection must
+already
+exist<span style="font-family: monospace;"></span>ed,
+so any packet
+coming inside will be in response to a current connection that could
+have only
+be initiated from the internal network.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+05:</span> This is a simple rule
+that will forward any packets from the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">eth1</span>
+interface and out the (<span style="font-family: monospace;">-o</span>)
+<span style="font-family: monospace;">ppp0</span>
+interface if they are from
+the (<span style="font-family: monospace;">-s</span>)
+<span style="font-family: monospace;">192.168.1.0/24</span>
+source network.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+This is rule does not detail any connection state so it will allow all
+connection types, but most important is the <span style="font-family: monospace;">NEW</span>
+connection state that it
+can pass. This rule allows internal workstations to create new
+connections,
+and matches rule 4 which allow the packets to return.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+06:</span> This rule does the
+exact same as if it were a <span style="font-family: monospace;">SNAT</span>
+rule, however being a <span style="font-family: monospace;">MASQUERADE</span>
+rule means it will use the IP address that is currently assigned to the
+<span style="font-family: monospace;">ppp0</span>
+interface when the
+packet passes through the NAT device.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Any packets that now pass from the internal private network out into
+the Internet will have its source address rewritten as the external IP
+address of the NAT device.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+07:</span> This command tells the
+kernel that it is allowed to forward packets between any of its network
+devices. These packets are still subject to the iptables rulesets.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Remember, masquerading should always be used for dynamic IP connections.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h3>Dangerous Masquerading Rule</h3>
+
+
+
+
+
+
+
+
+
+Beware of this rule, it is too relaxed and does not specify which
+direction the packets should be masqueraded. In fact, this rule allows
+masquerading in BOTH directions. Always specify an (<span style="font-family: monospace;">-o</span>)
+out interface parameter to
+make the rule work in one direction only.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">iptables -t nat
+-A POSTROUTING -j
+MASQUERADE</span> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!" src="images/warning.gif"></td>
+
+
+
+
+
+
+
+
+
+      <td>WARNING: The above rule
+is dangerous, it allows masquerading
+in both directions.<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="dnat"></a><a href="#top">Destination
+NAT</a></h2>
+
+
+
+
+
+
+
+
+
+Destination NAT deals with changing the destination address of any
+packets before they are subjected to any routing decisions. This allows
+specific traffic to be rewritten so it suits a particular rule and can
+then be redirected depending on the global policies and destinations
+required.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+In its most typical application, DNAT is normally used to
+change incoming packets that are destined for a particular service
+or host, and it rewrites the destination addresses so the packets can
+pass to a different host located inside the private network, normally a DMZ.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+When DNAT occurs, the original host (which is located external of the
+private network) is not aware the packets have been redirected and that
+the
+returning data is from a different server. It should be transparent to
+the originator.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+The following commands can be typed at the command prompt, and the <span style="font-family: monospace;">filter</span>
+and <span style="font-family: monospace;">nat</span>
+tables displayed using the
+last command.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01- [bash]# <span style="font-weight: bold;">iptables -P
+INPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+02- [bash]# <span style="font-weight: bold;">iptables -P FORWARD DROP</span><br>
+
+
+
+
+
+
+
+
+
+03- [bash]# <span style="font-weight: bold;">iptables -P OUTPUT ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+04- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i eth1 -o ppp0 -s 192.168.1.0/24 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+05- [bash]# <span style="font-weight: bold;">iptables -A FORWARD -i ppp0 -o eth1 -p tcp --dport 80 -j
+ACCEPT</span><br>
+
+
+
+
+
+
+
+
+
+06- [bash]# <span style="font-weight: bold;">iptables -t nat -A PREROUTING -i ppp0 -p tcp --dport 80 -j
+DNAT
+--to-destination 192.168.1.2:80</span><br>
+
+
+
+
+
+
+
+
+
+07- [bash]# <span style="font-weight: bold;">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -nvL ; iptables -t nat -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>01-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+02-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+04-<br>
+
+
+
+
+
+
+
+
+
+05-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+03-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+06-<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td>Chain INPUT (policy
+ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; all&nbsp;
+--&nbsp; eth1 &nbsp;
+ppp0&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+ACCEPT&nbsp;&nbsp;&nbsp;&nbsp; tcp&nbsp;
+--&nbsp; ppp0&nbsp;&nbsp;
+eth1 &nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.0/24&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tcp
+dpt:80<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp; 0
+DNAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp&nbsp; --&nbsp;
+ppp0&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tcp dpt:80 to:192.168.1.2:80<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain POSTROUTING (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)<br>
+
+
+
+
+
+
+
+
+
+&nbsp;pkts bytes target&nbsp;&nbsp;&nbsp;&nbsp;
+prot opt
+in&nbsp;&nbsp;&nbsp;&nbsp;
+out&nbsp;&nbsp;&nbsp;&nbsp;
+source&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+destination<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Lines
+01-03:</span> The first three
+commands have now defined the global policies for the three built-in
+chains for the <span style="font-family: monospace;">filter</span>
+table.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+To keep the example a little easier to understand, we are going to
+accept everything that is classed as <span style="font-family: monospace;">INPUT</span>
+or <span style="font-family: monospace;">OUTPUT</span>,
+and for security we are
+dropping anything trying to pass through the NAT unless we allow it.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+04-05:</span> The first <span style="font-family: monospace;">FORWARD</span>
+rule (04) allows any
+packets coming in the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">eth1</span>
+interface and out the
+(<span style="font-family: monospace;">-o</span>)
+<span style="font-family: monospace;">ppp0</span>
+interface if they have
+come from the internal (<span style="font-family: monospace;">-s</span>)
+source <span style="font-family: monospace;">192.168.1.0/24</span>
+network. The second <span style="font-family: monospace;">FORWARD</span>
+rule (05) allows any packets coming in the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">ppp0</span>
+interface and out the (<span style="font-family: monospace;">-o</span>)
+<span style="font-family: monospace;">eth1</span>
+interface that are using
+the <span style="font-family: monospace;">TCP</span>
+(<span style="font-family: monospace;">-p</span>)
+protocol if they are going
+to (<span style="font-family: monospace;">--dport</span>)
+destination
+port <span style="font-family: monospace;">80</span>.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+These two rules complement each other, the first allows outgoing
+packets to be forwarded from the internal network and the second rule
+allows incoming packets to be forwarded into the private network but
+only if they are going to a web server (port 80).<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+Is this going to work? Well lets look at the incoming packet's
+attributes with the following diagram. The remote host that originally
+sent the data requested a web page URL of "http://www.example.com"
+which resolved to the IP address of 123.123.123.2 and the packet was
+sent on its way. When it arrives at the NAT device, the destination
+address is still 123.123.123.2 so it must be handled by that IP address
+or rejected. But the web server is inside the network, what do we do?<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</span><span style="font-family: monospace;">                            </span><span style="font-family: monospace;">                                /-----------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp;
+/---------------------\ &nbsp; &nbsp; &nbsp;| &nbsp;Server (Routing)
+&nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;/-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; | Internal
+Web Server |------| &nbsp;eth1 : 192.168.1.1 &nbsp; | &nbsp;
+&nbsp;&nbsp; | Remote Computer |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; | &nbsp;
+192.168.1.2(80) &nbsp; | &nbsp; &nbsp; &nbsp;|&nbsp; ppp0 :
+123.123.123.2 |------| (Internet Zone) |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp;
+\---------------------/ &nbsp; &nbsp; &nbsp;\-----------------------/
+&nbsp; &nbsp; &nbsp;\-----------------/</span><br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+This is where DNAT is able to change the destination address of the
+incoming packet, and put the new address in its place (<span style="font-family: monospace;">192.168.1.2(80)</span>).
+Because DNAT
+is <span style="font-family: monospace;">PREROUTING</span>,
+the packet
+is now subjected to the kernel routing table which points the new
+packet to the internal network. Lastly, there must exist a rule in the <span style="font-family: monospace;">FORWARD</span>
+chain which will allow
+the packet to pass through, and there is, rule 05.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+06:</span> This is a <span style="font-family: monospace;">PREROUTING</span>
+rule in the <span style="font-family: monospace;">nat</span>
+table, if any packets come
+in through the (<span style="font-family: monospace;">-i</span>)
+<span style="font-family: monospace;">ppp0</span>
+interface and are (<span style="font-family: monospace;">-p</span>)
+<span style="font-family: monospace;">TCP</span>
+packets going to (<span style="font-family: monospace;">--dport</span>)
+destination of port <span style="font-family: monospace;">80</span>,
+then they are to be
+rewritten and sent to the host <span style="font-family: monospace;">192.168.1.2:80</span>
+instead.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">Line
+07:</span> This command tells the
+kernel that it is allowed to forward packets between any of its network
+devices. These packets are still subject to the iptables rulesets.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+DNAT declarations are reasonably easy because the destination header
+can be
+rewritten before the routing table is queried. Some important points to
+remember are:<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+
+  <li>DNAT can rewrite packets as
+they enter the Firewall (before
+routing),</li>
+
+
+
+
+
+
+
+
+
+  <li>If the new destination host
+is hacked, the Firewall host is not
+affected,<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>Do not DNAT a packet to
+another system that will DNAT it back
+(routing loops),</li>
+
+
+
+
+
+
+
+
+
+  <li>The "--to-destination"
+address does not have to be on the
+internal network, and<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+  <li>DNAT can also be used
+internally to protect vital systems from
+nasty employees.<br>
+
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="examplescript"></a><a href="#top">Example
+Firewall Script</a></h2>
+
+
+
+
+
+
+
+
+
+The following is an example firewall script which uses all of the
+concepts covered already in this chapter. It should therefore be
+relatively easy to understand, implement and maintain.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+The firewall script is designed to separate and secure the private
+network (eth1) from the Internet traffic (ppp0), while providing some
+flexibility for the internal network which is being masqueraded.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]#&nbsp;<span style="font-weight: bold;">vi /root/firewall.sh</span><span style="font-weight: bold;"></span><span style="font-weight: bold;"></span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>#!/bin/sh<br>
+
+
+
+
+
+
+
+
+
+#<br>
+
+
+
+
+
+
+
+
+
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Example
+Firewall Script<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+###############################################################<br>
+
+
+
+
+
+
+
+
+
+### Define interfaces here<br>
+
+
+
+
+
+
+
+EXT_DEV=ppp0<br>
+
+
+
+
+
+
+
+
+
+INT_DEV=eth1<br>
+
+
+
+
+
+
+
+
+
+INT_NET=192.168.1.0/24<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### Loading firewall modules<br>
+
+
+
+
+
+
+
+
+
+modprobe ip_conntrack<br>
+
+
+
+
+
+
+
+
+
+modprobe ip_conntrack_ftp<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+###############################################################<br>
+
+
+
+
+
+
+
+
+
+### Enable Packet Forwarding<br>
+
+
+
+
+
+
+
+
+
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### Remove all previous rules, and delete any user defined chains<br>
+
+
+
+
+
+
+
+
+
+iptables -F<br>
+
+
+
+
+
+
+
+
+
+iptables -X<br>
+
+
+
+
+
+
+
+
+
+iptables -t nat -F<br>
+
+
+
+
+
+
+
+
+
+
+iptables -t nat -X<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### Set the default policies to drop<br>
+
+
+
+
+
+
+
+
+
+iptables -P INPUT&nbsp;&nbsp; DROP<br>
+
+
+
+
+
+
+
+
+
+iptables -P OUTPUT&nbsp; DROP<br>
+
+
+
+
+
+
+
+
+
+iptables -P FORWARD DROP<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### Loopback device OK<br>
+
+
+
+
+
+
+
+
+iptables -A INPUT&nbsp; -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT<br>
+
+
+
+
+
+
+
+
+iptables -A OUTPUT -o lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### Allow all ICMP Traffic (optional) - IN, OUT and THROUGH.<br>
+
+
+
+
+
+
+
+
+iptables -A INPUT &nbsp; -p icmp --icmp-type any -j ACCEPT<br>
+
+
+
+
+
+
+
+
+
+iptables -A OUTPUT&nbsp; -p icmp --icmp-type any -j ACCEPT<br>
+
+
+
+
+
+
+
+
+iptables -A FORWARD -p icmp --icmp-type any -j ACCEPT<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+### Allow all Internal traffic to Server<br>
+
+
+
+
+
+
+
+
+
+iptables -A INPUT&nbsp; -i $INT_DEV -s $INT_NET -d $INT_NET -j ACCEPT<br>
+
+
+
+
+
+
+
+
+
+iptables -A OUTPUT -o $INT_DEV -s $INT_NET -d $INT_NET -j ACCEPT<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+###############################################################<br>
+
+
+
+
+
+
+
+
+
+### OUTBOUND Rule: Allow ALL packets out the external device<br>
+
+
+
+
+
+
+
+
+
+iptables -A OUTPUT&nbsp; -o $EXT_DEV -j ACCEPT<br>
+
+
+
+
+
+
+
+
+
+iptables -A FORWARD -i $INT_DEV -o $EXT_DEV -j ACCEPT<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+###############################################################<br>
+
+
+
+
+
+
+
+
+
+### MASQUERADING: All packets from the internal network will<br>
+
+
+
+
+
+
+
+
+
+### appear as if they had originated from the firewall.<br>
+
+
+
+
+
+
+
+
+
+iptables -t nat -A POSTROUTING -o $EXT_DEV -s $INT_NET -j MASQUERADE<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+###############################################################<br>
+
+
+
+
+
+
+
+
+
+### INBOUND Rule: Allow ALL EXT packets if a connection already exists (See "NEW" Inbound Rules)<br>
+
+
+
+
+
+
+
+
+
+iptables -A INPUT&nbsp;&nbsp; -i $EXT_DEV -m state --state
+RELATED,ESTABLISHED -j ACCEPT<br>
+
+
+
+
+
+
+
+
+iptables -A FORWARD -i $EXT_DEV -m state --state RELATED,ESTABLISHED -j
+ACCEPT<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+      <br>
+
+#<br>
+
+
+
+
+
+
+
+
+
+### INBOUND Rules: Allow ONLY NEW packets on these ports.<br>
+
+
+
+
+#<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+# New INBOUND Connection: FTP (with TLS)<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 20&nbsp;&nbsp;-j ACCEPT<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 21&nbsp; -j ACCEPT<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+# New INBOUND Connection: Secure Shell<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 22&nbsp;&nbsp;-j ACCEPT<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+# New INBOUND Connection: SMTP and SMTPS (over TLS/SSL)<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 25&nbsp;&nbsp;-j ACCEPT<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 465 -j ACCEPT<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+# New INBOUND Connection: HTTP (Plain and SSL)<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 80&nbsp; -j ACCEPT<br>
+
+
+
+
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 443 -j ACCEPT<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+# New INBOUND Connection: LDAPS Server (over SSL)<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 636&nbsp;-j ACCEPT<br>
+
+
+
+
+      <br>
+
+
+
+
+# New INBOUND Connection: IMAPS Email Clients (over SSL)<br>
+
+
+
+
+iptables -A INPUT -i $EXT_DEV -m state --state NEW -m tcp -p tcp --syn
+--dport 993 -j ACCEPT<br>
+
+      <br>
+
+###<br>
+
+# &nbsp; &nbsp;Squid Transparent Proxy: Enable rule for transparent proxy redirection<br>
+
+# Redirect all WWW (port 80) OUTBOUNT packets to the Squid Server on port&nbsp;3128<br>
+
+#iptables -t nat -A PREROUTING -i $INT_DEV -s $INT_NET -p tcp --dport 80&nbsp; -j REDIRECT --to-port 3128<br>
+
+
+
+
+      <br>
+
+      <br>
+
+
+
+
+#<br>
+
+
+
+
+
+
+
+
+
+### INBOUND DNAT (redirection) Rules: Allow ONLY NEW packets on these ports and redirect to internal services.<br>
+
+
+
+
+#<br>
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### INBOUND Rule: Redirect ALL packets to the INTERNAL workstation -
+HTTP<br>
+
+
+
+
+
+
+
+
+
+#iptables -t nat -A PREROUTING -i $EXT_DEV -p tcp --dport 80 -j DNAT
+--to-destination wkstn1.example.com:80<br>
+
+
+
+
+
+
+
+
+
+#iptables -A FORWARD -i $EXT_DEV -o $INT_DEV -p tcp --dport 80 -j
+ACCEPT<br>
+
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+
+### INBOUND Rule: Redirect ALL packets to the INTERNAL workstation -
+HTTPS<br>
+
+
+
+
+
+
+
+
+
+#iptables -t nat -A PREROUTING -i $EXT_DEV -p tcp --dport 443 -j DNAT
+--to-destination wkstn1.example.com:443<br>
+
+
+
+
+
+
+
+
+
+#iptables -A FORWARD -i $EXT_DEV -o $INT_DEV -p tcp --dport 443 -j
+ACCEPT<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+After the firewall script has been executed and the new firewall rules
+are active, the iptable settings can be saved so they are automatically
+implemented when the firewall is next started.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">sh /root/firewall.sh</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">/etc/init.d/iptables
+save</span> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+You should now restart the iptables service and see if the tables and
+chains are the same.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/iptables
+restart</span><br>
+
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">iptables -nvL ; iptables -t nat -nvL</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+If you intend to use the initscripts to automatically start
+the iptables service, then any firewall modules that are needed will
+have to be manually added to the init script.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/init.d/iptables</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>IPTABLES_MODULES="ip_conntrack
+ip_conntrack_ftp"<br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+You can check to see if the modules loaded automatically by listing all
+of modules currently being used by the kernel.<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">lsmod</span><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="05-Broadband_Connectivity.html">Previous</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="07-Package_Management.html">Next</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,3486 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Package Management</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="06-Firewall_Concepts.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="08-Domain_Name_System_BIND.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<hr>
+<h1>Chapter
+7 - Package Management</h1>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><a href="#yum">Yum Update
+Manager</a><br>
+
+
+
+
+
+
+<a href="#mirror">Changing
+Your Mirror</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+One of the worst thoughts any system administrator can have is the
+possibility of unauthorised individuals gaining privileged access to
+their information systems. It doesn't matter how detailed and complex
+the security system is, but if they're running applications that have
+known bugs and vulnerabilities, then there is a risk.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+A 'bug' is the term used to define when an application or system does
+not perform the way it was expected to against known criteria, like
+when a program crashes with a system error message after you pressed
+the print button (normally just before you saved it). A 'vulnerability'
+is the term used when that bug can be exploited in a particular way,
+that it is possible to affect the host system. By only running the
+desired applications needed for the host computer to achieve its task,
+and by ensuring these packages are updated against known
+vulnerabilities,
+then the chances of system exploitation can be greatly reduced.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Although your favourite Linux distribution may have just released its
+latest version, it is likely that by the time you are ready to install
+the operating system that there are already updated packages available.
+It is therefore good practice to update your packages before you
+continue configuring your systems and then keep them maintained on a
+regular
+basis.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="yum"></a><a href="#top">Yum
+Update
+Manager</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Versions:</span></td>
+
+
+
+
+
+
+      <td>yum 2.6.1</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td></td>
+
+
+
+
+
+
+      <td>yumex 0.99.13 &nbsp; &nbsp; - &nbsp; &nbsp; (Graphical User Interface for YUM)</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+YUM is a command line application used to update the RPM packages on
+your Fedora system. With one command yum can update all of the
+installed applications on the host machine, it can also be configured
+to operate automatically during the night, ensuring your system stays
+up to date and vulnerability free.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The update manager will also solve any package dependency problems
+during the procedure and ask for confirmation before processing, or may
+automatically install the dependencies as required.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+The yum configuration is separated into two main parts; a configuration
+file for the update manager (/etc/yum.conf) and separate configuration
+files for each repository that yum can connect to for updates, as seen
+below:<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.conf</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[main]<br>
+
+
+
+
+
+
+cachedir=/var/cache/yum<br>
+
+
+
+
+
+
+keepcache=0<br>
+
+
+
+
+
+
+debuglevel=2<br>
+
+
+
+
+
+
+logfile=/var/log/yum.log<br>
+
+
+
+
+
+
+pkgpolicy=newest<br>
+
+
+
+
+
+
+distroverpkg=redhat-release<br>
+
+
+
+
+
+
+tolerant=1<br>
+
+
+
+
+
+
+exactarch=1<br>
+
+
+
+
+
+
+obsoletes=1<br>
+
+
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+
+
+plugins=1<br>
+
+
+
+
+
+
+metadata_expire=1800<br>
+
+
+
+
+
+
+retries=20<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">[main]</span>
+section
+(above) details the global configuration environment for the yum package
+manager, while individual repositories (below) are configured in separate files which are
+located in the <span style="font-family: monospace;">"/etc/yum.repos.d/"</span>
+directory. Activating the following three repositories are the minimum
+requirements to implement yum effectively; they are activated by default.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">fedora-core.repo</span>
+file
+details the <span style="font-family: monospace;">[core]</span>
+configuration, which specifies where to locate the original
+installation RPMs that shipped with your version of Fedora.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-core.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[core]<br>
+
+
+
+
+
+
+name=Fedora Core $releasever - $basearch<br>
+
+
+
+
+
+
+#baseurl=http://download.fedora.redhat.com/pub/fedora/linux/core/$releasever/$basearch/os/<br>
+
+
+
+
+
+
+mirrorlist=http://fedora.redhat.com/download/mirrors/fedora-core-$releasever<br>
+
+
+
+
+
+
+enabled=1<br>
+
+
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+
+
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora
+file:///etc/pki/rpm-gpg/RPM-GPG-KEY<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">fedora-updates.repo</span>
+file details the <span style="font-family: monospace;">[updates]</span>
+configuration, which specifies the location of any updated or newer
+RPMs than what where originally installed from the 
+
+
+<span style="font-family: monospace;">[core]</span> repository.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-updates.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[updates]<br>
+
+
+
+
+
+
+name=Fedora Core $releasever - $basearch - Updates<br>
+
+
+
+
+
+
+#baseurl=http://download.fedora.redhat.com/pub/fedora/linux/core/updates/$releasever/$basearch/<br>
+
+
+
+
+
+
+mirrorlist=http://fedora.redhat.com/download/mirrors/updates-released-fc$releasever<br>
+
+
+
+
+
+
+enabled=1<br>
+
+
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+
+
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+The <span style="font-family: monospace;">fedora-extras.repo</span> file details the <span style="font-family: monospace;">[extras]</span>
+configuration; this is repository of extra "niche" programs and
+applications that are considered external to the Fedora mainstream base
+applications, like "xmms" (MP3 Player) and "wine" (Windows API
+Emulator).<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-extras.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[extras]<br>
+
+
+
+
+name=Fedora Extras $releasever - $basearch<br>
+
+
+
+
+#baseurl=http://download.fedora.redhat.com/pub/fedora/linux/extras/$releasever/$basearch/<br>
+
+
+
+
+mirrorlist=http://fedora.redhat.com/download/mirrors/fedora-extras-$releasever<br>
+
+
+
+
+enabled=1<br>
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+
+
+      
+
+    
+
+  
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-extras<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>You should note that by default these repositories are
+initially configured to use a list of mirrors, this load balances the
+repositories to ensure that individual servers are not always wearing
+the full load when remote clients are updating their files. Specific
+servers can be configured later which may provide a faster download
+source than a random&nbsp;mirrored server list; see next section.</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Some of the specific parameters for the repositories are:<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">name<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Specifies a 'friendly'
+name for the repository<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">baseurl<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>The full URL to the
+packages. Can be http://&nbsp;
+ftp://&nbsp; or&nbsp; file://<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">mirrorlist<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Details the URL to
+locate a list of mirror servers<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">enabled<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Sets the repository as
+(in)active for updates<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">gpgcheck<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Confirms that all
+packages should be cryptographically
+verified - highly advisable<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); font-family: monospace; width: 180px;">gpgkey</td>
+
+
+
+
+
+
+      <td>Specifies the file and location where the cryptographic
+signature can be checked for each package being installed.</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+There may be occasions where it is inconvenient to install or upgrade
+certain packages (if you have a custom kernel for example), then these
+packages
+can be excluded from updating using a 'space separated' exclude parameter in
+the configuration file. The exclude statement can be located in the
+main section which stops
+all updates, or in one of the individual repository sections to stop
+that
+server providing the updated package.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.conf</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[main]<br>
+
+
+
+
+
+
+exclude=kernel kernel-smp samba*<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+All Fedora packages downloaded by yum from an authorised mirror site
+are cryptographically (or digitally) signed by the Red Hat or Fedora
+Project asymmetric key pairs. What this means is that all the packages
+contain a digital signature to ensure what you are downloading and
+installing originally comes from the Fedora Project and should not have
+been tampered with somewhere out on the Internet. The first time that
+yum downloads a package from either of the core, update or extras
+repositories, the cryptograph key that verifies the downloaded package
+is installed onto the system.<br>
+
+
+
+
+<br>
+
+
+
+
+The cryptographic keys can be installed manually prior to use if need
+be, by executing each of the following commands at the command
+prompt.&nbsp;You may
+also wish to check the validity (fingerprint) of the public keys
+yourself by viewing the <a href="http://fedora.redhat.com/about/security/">Fedora
+GPG Keys</a>
+information online (the keys are also available in the root directory
+of your
+CD/DVD media).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-extras</span><code style="font-weight: bold;" class="filename"></code><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+This list details some of the more common yum commands you will most
+likely require to maintain your system.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left; font-family: monospace; width: 100%;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 220px;">Some
+YUM Commands<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 676px;">Explanations<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum list</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">List all available
+packages<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum
+list http*</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">List all packages
+starting with "http"<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum
+check-update</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Check for available
+updates<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum
+update</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Update all available
+packages<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum
+update samba*</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">Update only the samba
+packages<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 220px; background-color: rgb(220, 220, 220);">[base]#
+      <span style="font-weight: bold;">yum
+install httpd</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Install the httpd package</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">[base]#
+      <span style="font-weight: bold;">yum
+install xmms wine</span></td>
+
+
+
+
+      <td>Install both the xmms and wine packages</td>
+
+
+
+
+    </tr>
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum -y
+install httpd</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Install package
+(answering yes to all questions)</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum provides httpd.conf</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">List package name that
+provides the
+"httpd.conf" file<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum clean all</span> </td>
+
+
+
+
+
+
+      <td style="width: 676px;">Removes cached packages
+and RPM headers from system<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum remove http*</span></td>
+
+
+
+
+
+
+      <td>Uninstalls all packages starting with "http"</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">/etc/init.d/yum start</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">Start the nightly
+updating service<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">chkconfig yum on</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">Enabling yum service on
+runlevels<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>Always take care when
+using any automated update service.
+Some updated packages may have different configurations and operating
+requirements than the ones that are currently installed. Always check
+which packages you have updated to ensure they function as they were
+originally configured.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+To save time when installing individual packages, yum can be called to
+install, update or remove whole groups of applications all at once,
+this&nbsp;can be done using the following group commands.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left; font-family: monospace; width: 100%;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 380px;">Some
+YUM Group Commands<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 676px;">Explanations<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum grouplist</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">List all groups which have packages for installation<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]#
+      <span style="font-weight: bold;">yum groupinfo "System Tools"</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 676px;">List all packages
+in the "System Tools" group<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]# <span style="font-weight: bold;">yum groupinstall "System Tools"</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Install all of the default packages in the "System Tools" group<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220); width: 220px;">[base]# <span style="font-weight: bold;">yum groupupdate "Office/Productivity"</span></td>
+
+
+
+
+
+
+      <td style="width: 676px;">Update all available
+packages within the "Office/Productivity" group<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="mirror"></a><a href="#top">Changing
+Your Mirror</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+Yum is initally configured to use a mirror list, which is a
+listing of servers that holds a replicated set of the Fedora RPMs. When
+the update manager uses a mirror list, they select a random server from
+the list each time the execute an update, this allows many more locations from
+which to access the available packages, and releases the strain on the
+master repository servers.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+For some reason you may need to use a particular server for your
+package manager to connect, say if some of the other mirrors are busy
+or slow, or your local ISP has a mirror allowing for unlimited
+downloads against your usage quota. There are many reasons why you
+might wish to assign your own server, and it's relatively easy to do.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The Fedora website maintains a list of all the <a href="http://fedora.redhat.com/download/mirrors.html">mirror
+sites</a>
+organised by country location. Use the list to locate a mirrored source
+that is closest to you, and follow the directions below to configure
+your particular package manager.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>Many ISPs provide FTP
+and other mirror services to their
+customers. Check your ISP, they may have a locally mirrored repository.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold; color: rgb(255, 0, 0);"></span>It
+can
+sometimes be a little trouble for users to locate the exact <span style="font-style: italic;">baseurl</span>
+to use when manually
+configuring a yum mirror, so here is an explanation to assist. The <span style="font-style: italic;">$releasever</span>
+variable means which
+release you are using, so Fedora Core 5 would simply be '<span style="font-style: italic;">5</span>'.
+The <span style="font-style: italic;">$basearch</span>
+variable refers to the
+architecture of your physical computer, and will be either <span style="font-style: italic;">i386</span>
+or <span style="font-style: italic;">x86_64</span>.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To locate the <span style="font-family: monospace;">[core]</span>
+repository, open up your <a href="http://fedora.redhat.com/download/mirrors.html">selected
+mirror</a>
+in a browser and follow the file structure similar to
+"../$releasever/$basearch/os/". Inside that directory you should now
+see another directory called "<span style="font-style: italic;">headers</span>"
+- bingo, now cut and paste the URL from your browser into your "<span style="font-family: monospace;">fedora-core.repo</span>"
+file (not including the headers directory).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-core.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[core]<br>
+
+
+
+
+name=Fedora Core $releasever - $basearch<br>
+
+
+
+
+baseurl=http://mirror.pacific.net.au/linux/fedora/linux/core/$releasever/$basearch/os/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; http://mirror.optus.net/fedora/core/$releasever/$basearch/os/<br>
+
+
+
+
+#mirrorlist=http://fedora.redhat.com/download/mirrors/fedora-core-$releasever<br>
+
+
+
+
+enabled=1<br>
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora file:///etc/pki/rpm-gpg/RPM-GPG-KEY<br>
+
+
+
+
+
+
+failovermethod=priority<br>
+
+
+
+
+
+
+      
+
+    
+
+  
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+The <span style="font-family: monospace;">[updates]</span>
+repository is similarly easy to locate, and should follow a file
+structure similar to "..updates/$releasever/$basearch/". Same as
+before, locate the "<span style="font-style: italic;">headers"</span>
+directory then copy the URL from your browser into the "<span style="font-family: monospace;">fedora-updates.repo</span>" file
+(not including the headers directory).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-updates.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td>[updates]<br>
+
+
+
+
+name=Fedora Core $releasever - $basearch - Updates<br>
+
+
+
+
+baseurl=http://mirror.pacific.net.au/linux/fedora/linux/core/updates/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; http://public.planetmirror.com/pub/fedora/linux/core/updates/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; ftp://ftp.pipenetworks.com/pub/fedora/linux/updates/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; http://mirror.optus.net/fedora/core/updates/$releasever/$basearch/<br>
+
+
+
+
+#mirrorlist=http://fedora.redhat.com/download/mirrors/updates-released-fc$releasever<br>
+
+
+
+
+enabled=1<br>
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora<br>
+
+
+
+
+
+
+failovermethod=priority<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+The <span style="font-family: monospace;">[extras]</span> repositories uses the same naming conventions as the <span style="font-family: monospace;">[updates]</span>
+configuration file, so you should be able to find some locally
+available mirrors that are easy to configure for your needs. Remember
+to remove or comment out the <span style="font-family: monospace;">"mirrorlist"</span> entry for the <span style="font-family: monospace;">baseurl</span> entries will not work.<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/yum.repos.d/fedora-extras.repo</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[extras]<br>
+
+
+
+
+name=Fedora Extras $releasever - $basearch<br>
+
+
+
+
+baseurl=http://mirror.pacific.net.au/linux/fedora/linux/extras/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; http://public.planetmirror.com/pub/fedora/linux/extras/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; ftp://ftp.pipenetworks.com/pub/fedora/linux/extras/$releasever/$basearch/<br>
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; http://mirror.optus.net/fedora/extras/$releasever/$basearch/<br>
+
+
+
+
+#mirrorlist=http://fedora.redhat.com/download/mirrors/fedora-extras-$releasever<br>
+
+
+
+
+enabled=1<br>
+
+
+
+
+gpgcheck=1<br>
+
+
+
+
+
+
+    
+
+  
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-extras<br>
+
+
+
+
+
+
+failovermethod=priority<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+
+
+
+The above two configurations now
+use four (<span style="font-family: monospace;">baseurl</span>)
+locally configured
+mirrors which will be randomly checked for updates. By specifying the <span style="font-family: monospace;">"failovermethod=priority"</span>
+option,
+it tells yum to query the three mirrors in the order they have been
+listed for the repository.<br>
+
+
+
+
+<br>
+
+
+
+
+Your&nbsp;configured repositories should now resemble the three above examples, be
+sure to remove the "<span style="font-family: monospace;">mirrorlist</span>"
+entries (or comment them out). You should now save your configuration changes and
+test your new yum mirrors.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="06-Firewall_Concepts.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a></td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="08-Domain_Name_System_BIND.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+</body>
+</html>

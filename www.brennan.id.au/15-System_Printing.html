@@ -1,0 +1,2217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - System Printing</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+</div>
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="14-FTP_Server.html">Previous</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="16-Secure_Shell.html">Next</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<hr>
+<h1>Chapter 15 - System Printing<br>
+
+
+
+
+
+</h1>
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+  <tbody>
+
+
+
+
+    <tr>
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+      <td>- cups 1.2.1</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+<a href="#config">Configuring
+CUPS</a><br>
+
+
+
+
+
+<a href="#addprinter">Adding
+CUPS Printers</a><br>
+
+
+
+
+
+<a href="#installdriver">Installing
+The Driver File</a><br>
+
+
+
+
+
+<br>
+
+
+
+
+
+There have been many Linux printing applications over the years,
+ranging from sneaker net to full scale network printing systems, all of
+which continue to get better with developing new technologies. One of
+the latest Linux printing solutions is the <a href="http://www.cups.org">Common
+UNIX Printing System</a> (CUPS), it
+supports the Internet Printing Protocol (IPP) and provides a complete
+platform independent printing solution for most networking
+environments. The CUPS server is able to be administered remotely using
+a web browser, which makes it ideal for a 'headless server'.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The initial installation of CUPS only allows access from the host
+computer and also only supports around twenty different print drivers.
+This
+chapter will configure the CUPS daemon so it is accessible for your
+whole network, it will also give guidance for configuring your own
+printers and updating their driver files.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="config"></a><a href="#top">Configuring
+CUPS</a><br>
+
+
+
+
+
+</h2>
+
+
+
+
+
+The configuration file for CUPS looks and feels very similar to that
+of Apache, so you may already be familiar with some of the concepts for
+accept/deny etc.. As with all configuration files we need to back it up
+before we make any changes. This is particularly important as most of
+the GUI applications that support CUPS will overwrite the files after
+you have made changes, so a backup of the original is important.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+One of the major CUPS advantages is that it can be completely
+controlled remotely using a standard web browser, so really all we need
+to do is get it configured and then access it remotely. However this
+guide will provide all the steps necessary to configure from the
+command line (print drivers need to be updated manually).<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/cups/cupsd.conf /etc/cups/cupsd.conf.original</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/cups/cupsd.conf</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The following basic directives are typical of a standard CUPS
+configuration, there are many more settings which are available, but
+most of the default values do not need adjusting. For more details on
+the full range of directives, type "<span style="font-family: monospace;">man
+cupsd.conf</span>" at the command
+prompt.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="background-color: rgb(220, 220, 220); text-align: left; font-family: monospace; width: 100%;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>ServerName
+galaxy.example.com<br>
+
+
+
+
+
+ServerAdmin admin@example.com<br>
+
+
+
+
+
+AccessLog /var/log/cups/access_log<br>
+
+
+
+
+
+DataDir /usr/share/cups<br>
+
+
+
+
+
+DefaultCharset utf-8<br>
+
+
+
+
+
+DefaultLanguage en<br>
+
+
+
+
+
+ErrorLog /var/log/cups/error_log<br>
+
+
+
+
+
+MaxLogSize 10485760<br>
+
+
+
+
+
+LogLevel info<br>
+
+
+
+
+
+Printcap /etc/printcap<br>
+
+
+
+
+
+RequestRoot /var/spool/cups<br>
+
+
+
+
+
+ServerBin /usr/lib/cups<br>
+
+
+
+
+
+ServerRoot /etc/cups<br>
+
+
+
+
+
+User lp<br>
+
+
+
+
+
+Group sys<br>
+
+
+
+
+
+Listen 127.0.0.1:631<br>
+
+
+
+
+
+Listen 192.168.1.1:631<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+To access the resources remotely via a web browser, we need to specify
+the access controls (deny/allow) which will be applied to each
+resource. The "<span style="font-family: monospace;">/</span>"
+(root)
+resource may be provided to all users without any authentication so
+they may view which printers are available and the status of the queues.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The "<span style="font-family: monospace;">admin</span>"
+resource has
+been configured for authentication so that all the administration tasks
+are only accessible to authorised personnel. It is important to note
+that no encryption has been established for CUPS in our configuration
+(it is optional),
+so if you are administering the system via an untrusted network, be
+aware that your user details may be captured. This should not be a
+problem
+for home networks.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&lt;Location
+/&gt;<br>
+
+&nbsp; &nbsp; &nbsp; Require&nbsp;valid-user<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Order Deny,Allow<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Deny From All<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From 127.0.0.1<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From
+192.168.1.0/24<br>
+
+
+
+
+
+&lt;/Location&gt;<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&lt;Location /admin&gt;<br>
+
+&nbsp; &nbsp; &nbsp; Require group&nbsp;printer-admins<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Order Deny,Allow<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Deny From All<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From 127.0.0.1<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From
+192.168.1.0/24<br>
+
+
+
+
+
+&lt;/Location&gt;<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+&nbsp;CUPS is a full networking solution and it is capable of
+browsing
+the network and discovering other CUPS servers. Depending on the
+configuration, this allows full administration of all your network
+printers so they can be centrally managed from the one location. The
+default for browsing is on, however for a small home network you would
+probably prefer to turn this feature off.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Browsing Off<br>
+
+
+
+
+
+BrowseProtocols cups<br>
+
+
+
+
+
+BrowseOrder Deny,Allow<br>
+
+
+
+
+
+BrowseAllow from @LOCAL<br>
+
+
+
+
+
+BrowseAllow from @IF(eth1)<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The initial CUPS configuration is now complete. Set the appropriate run
+levels for your service and then check to make sure they are correct.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 2345 cups on</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chkconfig
+--list cups</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The service can now be started, be sure to check the system log to see
+if any errors have occurred.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/cups
+restart</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">tail /var/log/cups/error_log</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The CUPS daemon can now be controlled through a standard web browser if
+you are connecting from either the localhost, or from the internal
+network. The service is running on port 631 (default) and can be
+accessed here: <a href="http://localhost:631/">http://localhost:631</a>.<br>
+
+
+
+
+
+<br>
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">groupadd printer-admins</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">usermod -G printer-admins miles</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+<br>
+
+<br>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+      <td>Printers and their
+drivers need to be configured before any
+printing is possible, see below for details.<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+<br>
+
+
+
+
+
+<h2><a name="addprinter"></a><a href="#top">Adding CUPS
+Printers</a><br>
+
+
+
+
+
+</h2>
+
+
+
+
+
+Adding a new printer using the CUPS web interface is very easy, however
+we are going to configure our printers manually through the
+configuration files. Firstly we need to make our backup configurations.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/cups/printers.conf
+/etc/cups/printers.conf.original</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/cups/printers.conf</span> </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+All of the details for each of our printers is stored in the "<span style="font-family: monospace;">printers.conf</span>"
+file. The
+configuration directives needed in the configuration file are very
+simple, and can be further explained by accessing the man page by
+typing "<span style="font-family: monospace;">man
+printers.conf</span>"
+at the command prompt.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+You should note that there is a <span style="font-family: monospace;">DefaultPrinter</span>
+and standard <span style="font-family: monospace;">Printer</span>
+configuration (below example), there can only be one <span style="font-family: monospace;">DefaultPrinter</span>
+directive while
+any additional printers should be defined simply as <span style="font-family: monospace;">Printer</span>.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The names for both of these printers (<span style="font-family: monospace;">laser</span>
+and <span style="font-family: monospace;">bubblejet</span>)
+are used in some
+other configuration areas. So ensure which ever name you choose that
+they are constant throughout your configuration of that printer.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&lt;DefaultPrinter
+laser&gt;<br>
+
+ &nbsp; &nbsp; &nbsp; AllowUser miles @laser_printer_group<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp; Info Laser Printer - Brother HL-1430<br>
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; DeviceURI parallel:/dev/lp0<br>
+
+
+
+
+
+&nbsp;&nbsp; &nbsp;&nbsp; Location Main Conference Room<br>
+
+&nbsp; &nbsp; &nbsp; Shared Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; &nbsp;&nbsp; State Idle<br>
+
+
+
+
+
+&nbsp;&nbsp; &nbsp;&nbsp; Accepting Yes<br>
+
+
+
+
+
+&lt;/Printer&gt;<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&lt;Printer bubblejet&gt;<br>
+
+ &nbsp; &nbsp; &nbsp; AllowUser miles<br>
+
+&nbsp; &nbsp; &nbsp; DenyUser @no_print_group<br>
+
+&nbsp; &nbsp;&nbsp;&nbsp; Info Bubblejet - HP PhotoSmart-7260<br>
+
+
+
+
+
+&nbsp;&nbsp; &nbsp;&nbsp; DeviceURI usb:/dev/usb/lp0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Location Administration Office<br>
+
+&nbsp; &nbsp; &nbsp; Shared Yes<br>
+
+
+
+
+
+&nbsp;&nbsp; &nbsp;&nbsp; State Idle<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Accepting Yes<br>
+
+
+
+
+
+&lt;/Printer&gt;<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+The DeviceURI (Uniform Resource Identifiers) specifies the device that
+is assigned to the printer. Below are some of the possible DeviceURI
+types and examples. Each printer that is defined in the configuration
+file must have a DeviceURI specified.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="background-color: rgb(255, 255, 255);"><span style="font-weight: bold;">Example
+DeviceURI Types</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>#DeviceURI
+parallel:/dev/plp<br>
+
+
+
+
+
+#DeviceURI serial:/dev/ttyd1?baud=38400+size=8+parity=none+flow=soft<br>
+
+
+
+
+
+#DeviceURI scsi:/dev/scsi/sc1d6l0<br>
+
+
+
+
+
+#DeviceURI socket://hostname:port<br>
+
+
+
+
+
+#DeviceURI tftp://hostname/path<br>
+
+
+
+
+
+#DeviceURI ftp://hostname/path<br>
+
+
+
+
+
+#DeviceURI http://hostname[:port]/path<br>
+
+
+
+
+
+#DeviceURI ipp://hostname/path<br>
+
+
+
+
+
+#DeviceURI smb://hostname/printer<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+In the initial configuration of the CUPS daemon we specified the
+allow/deny directives for the "<span style="font-family: monospace;">/</span>"
+(root) and "<span style="font-family: monospace;">admin</span>"
+resources. If access to the "/" (root) resource is restricted to only
+the localhost, then the printer queues will need to be adjusted so that
+all of the workstations on the internal network can access and print to
+the queues.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+If everyone does have access to the "<span style="font-family: monospace;">/</span>"
+(root) resource, then adding
+the following details anyway does not matter.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/cups/cupsd.conf</span></td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>&lt;Location
+/printers/laser&gt;<br>
+
+      <span style="color: rgb(255, 0, 0);"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Order Deny,Allow<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Deny From All<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From 127.0.0.1<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From
+192.168.1.0/24<br>
+
+
+
+
+
+&lt;/Location&gt;<br>
+
+
+
+
+
+      <br>
+
+
+
+
+
+&lt;Location /printers/bubblejet&gt;<br>
+
+      <span style="color: rgb(255, 0, 0);"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Order Deny,Allow<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Deny From All<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From 127.0.0.1<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow From
+192.168.1.0/24<br>
+
+
+
+
+
+&lt;/Location&gt;<br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+Now that the printers have been configured, the service needs to be
+restarted so the changes can take effect.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/cups
+restart</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">tail /var/log/cups/error_log</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+All of the internal workstations are now able to connect to the printer
+queues that you have configured. Your print jobs can now be sent
+straight to <span style="font-family: monospace;">"http://www.example.com:631/printers/laser</span>"
+or "<span style="font-family: monospace;">http://192.168.1.1:631/printers/bubblejet</span>",
+or which ever URL you have configured. Remember you still need to
+configure your driver file before printing.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h2><a name="installdriver"></a><a href="#top">Installing
+The Driver
+File</a><br>
+
+
+
+
+
+</h2>
+
+
+
+
+
+When you send a print job to the server it is placed into the desired
+print queue and then waits to be printed. If the printer understands
+the format of the file in the queue it will be printed without any
+problem, however if the format of the file is unknown then the printer
+will very likely print pages and pages of hieroglyphics; we all hate
+that !<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+The printer file we are going to install is a PostScript Printer
+Description (PPD) file which interprets the file as it gets sent to the
+print queue, the PPD file details the printers capabilities and ensures
+that the incoming print job is properly formatted for the printer.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+CUPS only has built in support for about 20 generic printers so we need
+to install extra PPD files for each of the print queues we need to set
+up. There are two ways to set up the files, an individual PPD for each
+printer, or by downloading a complete set of PPD files into the CUPS
+printer list.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Individual Driver Files</h3>
+
+
+
+
+
+To install the individual PPD files we need to head over to
+LinuxPrinting.org (<a href="http://www.linuxprinting.org/printer_list.cgi">http://www.linuxprinting.org/printer_list.cgi</a>)
+and select the printer that we are configuring from the online
+database. When we have located the correct printer from the database we
+will be presented with an option to "Download PPD". Download a copy of
+the PPD file to your local server.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Earlier when we were configuring the print queues in the <span style="font-family: monospace;">printers.conf</span>
+file, we
+specified two printers which we named <span style="font-family: monospace;">laser</span>
+and <span style="font-family: monospace;">bubblejet</span>
+respectively. To set
+the correct PPD file with the correct printer, place a copy of the
+downloaded PPD file into the <span style="font-family: monospace;">/etc/cups/ppd</span>
+directory with the filenames matching the names of the queues, similar
+to the examples below.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 180px;">&lt;DefaultPrinter <span style="font-weight: bold;">laser</span>&gt; </td>
+
+
+
+
+
+      <td style="width: 719px;">/etc/cups/ppd/<span style="font-weight: bold;">laser</span>.ppd</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 180px;">&lt;Printer <span style="font-weight: bold;">bubblejet</span>&gt; </td>
+
+
+
+
+
+      <td style="width: 719px;">/etc/cups/ppd/<span style="font-weight: bold;">bubblejet</span>.ppd</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+You should restart the cups service for the PPD files to be loaded.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/cups
+restart</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+<h3>Complete Driver Set</h3>
+
+
+
+
+
+To configure the complete PPD file set, head over to LinuxPrinting.org (<a href="http://www.linuxprinting.org/download/foomatic">http://www.linuxprinting.org/download/foomatic</a>)
+and download the latest ("current") foomatic filter tarball.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+Using the following commands, extract the tarball file and install the
+PPD files into CUPS. Once the files have been installed the service
+should be restarted.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">wget -O /tmp/foomatic-filters-ppds-current.tar.gz &nbsp; \</span><br style="font-weight: bold;">
+
+      <span style="font-weight: bold;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;http://www.linuxprinting.org/download/foomatic/foomatic-filters-ppds-current.tar.gz&nbsp;-U ""</span><br>
+
+[bash]# <span style="font-weight: bold;">tar -xzvf
+/tmp/foomatic-filters-ppds*.tar.gz -C /tmp</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">cd /tmp/foomatic</span><span style="font-weight: bold;">-filters-ppds</span><span style="font-family: mon; font-weight: bold;"></span><span style="font-family: mon; font-weight: bold;">*</span><span style="font-family: mon; font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">./install --gzip</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/cups
+restart</span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">tail /var/log/cups/error_log</span><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+      <td>
+
+
+
+[bash]# <span style="font-weight: bold;">cd /</span><span style="font-family: mon; font-weight: bold;"></span><br>
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">rm -Rf /tmp/foomatic</span><span style="font-weight: bold;">-filters-ppds</span><span style="font-family: mon; font-weight: bold;"></span><span style="font-weight: bold;">*</span><span style="font-family: mon; font-weight: bold;"></span>
+
+
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+
+
+
+
+The CUPS server may take a few minutes to restart while it imports all
+the new PPD files, this is normal and the extracted archive is safe to
+delete once the files have been imported.<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="14-FTP_Server.html">Previous</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="16-Secure_Shell.html">Next</a><br>
+
+
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+</body>
+</html>

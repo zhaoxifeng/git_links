@@ -1,0 +1,6309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Installing Server Packages</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="02-Planning_Considerations.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="04-Network_Configuration.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<hr>
+<h1>Chapter 3 - Installing Linux<br>
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+<a href="#checklist">Pre-Installation
+Requirements (Checklist)</a><br>
+
+
+
+
+
+
+<a href="#install">Installation
+Procedure (Step by Step Guide)</a><br>
+
+
+
+
+
+
+<a href="#posttasks">Post
+Installation Tasks</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+This chapter has <a href="http://fedora.redhat.com/"><span style="font-weight: bold; text-decoration: underline;">Fedora
+Core 5</span></a> specific installation information.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="checklist"></a><a href="#top">Pre-Installation
+Requirements
+(Checklist)</a></h2>
+
+
+
+
+
+
+In the last chapter we identified some of the planning considerations
+needed before we even commenced with our server installation. Now we
+are ready to start configuring our system, we must make sure we have
+all the configuration settings available during the installation
+process, so it runs smoothly and is trouble free.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+The following checklist can be used as a printable guide to document
+your configurations before you start your installation. It is intended
+as a guide only, but is typical of the information required during a
+system installation.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 225px;"><span style="font-weight: bold;">Server
+Settings</span> </td>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 160px;">Example
+Values
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="font-weight: bold;">Your
+Parameters (as applicable)
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Kernel
+Parameters
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Nil
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _ _</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Install
+/ Upgrade
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Install
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Installation
+Type
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Server
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Partitioning
+- Auto /
+Manual
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Auto
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Hard Drive 0
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/hda
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Hard Drive 1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/hdb
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Hard Drive 2
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/sda
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+DVD/CDROM
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/hdc
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+DVD/CD Burner
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/hdd
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">GRUB
+Boot Loader
+Installed
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">/dev/hda
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">External
+Network Device
+- eth0
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+IP Address
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Dynamic
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Subnet Mask
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Dynamic
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Internal
+Network Device
+- eth1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">&nbsp;</td>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+IP Address
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">192.168.1.1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Subnet Mask
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">255.255.255.0
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Modem
+Settings
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+IP Address
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Dynamic
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Subnet Mask
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Dynamic
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Fully
+Qualified Hostname</td>
+
+
+
+
+
+
+      <td style="width: 160px;">galaxy.example.com</td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Gateway
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Nil
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Primary
+DNS
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">127.0.0.1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Secondary
+DNS
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Nil
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;"><span style="font-weight: bold;">Internet
+Settings</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">Your
+Parameters (as
+applicable)</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">ISP
+Name
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">ISP
+Account Name
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">ISP
+Account Password
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Static
+IP / Subnet
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;">Or
+DHCP
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">DNS
+Server 1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">DNS
+Server 2
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">DNS
+Server 3
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">NTP
+Server
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Helpdesk
+Phone Number
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 160px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>_ _ _ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="install"></a><a href="#top">Installation
+Procedure (Step
+by Step Guide)</a></h2>
+
+
+
+
+
+
+Now that we've completed all of our system planning and our checklist
+has been prepared, we are now in a position to start installing the
+operating system and required packages on our server - finally some
+'hands on' you say.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>The following
+installation procedure has been written as a step by step
+guide to fulfil the configuration and package requirements needed in
+the HOWTO, some people may find it too
+basic and you are welcome to skip ahead. However please review the list
+of packages being installed below, this may save you installing
+them later because they were missed.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>The step by step guide
+is written for Fedora Core 5 and may
+not be suitable for other Linux Distributions.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+1.&nbsp;&nbsp;&nbsp; Once the bootable DVD/CD initialises
+and the installation process starts execution, you will be presented
+with the Fedora Core welcome page, and a "<span style="font-family: monospace;">boot:</span>"
+prompt will be located at the bottom of the screen. The boot prompt
+allows us to pass specific parameters about any hardware or
+configuration settings to the kernel. It also allows us to specify that
+we may have a driver disk for some type of hardware that is not yet
+supported by the kernel, like a network card or hard drive controller.
+You may also choose to upgrade an existing version of Fedora from the
+prompt.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(223, 223, 223);"><span style="font-family: monospace;">boot:
+      <span style="font-weight: bold;">linux dd noprobe acpi=off</span></span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<span style="font-weight: bold;">Example:</span>
+The boot prompt with parameters being passed to the kernel.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+If you are doing a clean installation of Fedora Core, you would most
+likely press the &lt;ENTER&gt; key at the "<span style="font-family: monospace;">boot:</span>"
+prompt to continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+2.&nbsp;&nbsp; If you chose to install a driver disk, you will
+now be prompted for the diskette. Insert the diskette and follow the
+directions on screen to install the extra drivers if applicable.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+3.&nbsp;&nbsp; You will now be presented with an option to
+check the integrity of the DVD/CD media you are using to conduct the
+installation. It is highly advisable to test the media at this point.
+If your media is scratched, or the integrity of the ISO image was
+corrupted during its download, then it is highly likely that the
+installation may stall or become unstable. If in doubt check your
+media, it only takes a few minutes, and may save you the anguish of
+having to conduct a second installation attempt.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+You will be advised of any failed media checks during this stage, at
+which point you will need to correct the media problem before
+continuing.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+4.&nbsp;&nbsp; <span style="font-weight: bold;">Welcome
+to Fedora: </span>The next stage in
+the installation is the loading of the Anaconda system installer, where
+you will be presented with installation options using an Xwindows
+frontend. We will continue to use the Anaconda interface throughout the
+entire installation process.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+The release notes will be available for you to view if you choose,
+which is recommended. They identify what the minimum hardware
+specifications are for an installation of Fedora Core, and which
+applications have been added, changed, or removed from the previous
+version. They also identify and provide solutions to any known bugs
+which may affect certain hardware, or installation errors that may
+occur during or after the installation process.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+After you have read the release notes, you may select
+&lt;NEXT&gt; to continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>You
+can choose not to use Anaconda for your installation, or you may have
+difficulty loading the interface if your video card is not yet
+supported. If this is the case, you can continue your installation
+using the standard text mode.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>The Anaconda installer
+provides documented help files for the remainder of the installation
+process. It is recommended you consult these help files when you are
+uncertain and require further clarification.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+5.&nbsp;&nbsp; <span style="font-weight: bold;">Language
+Selection:</span> You will now be
+asked to choose the language you would like during the installation,
+make your selection and press &lt;NEXT&gt; to continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+6.&nbsp;&nbsp; <span style="font-weight: bold;">Keyboard
+Configuration:</span> You are also
+presented with an option for keyboard, make your selection and press
+&lt;NEXT&gt; to continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+7.&nbsp;&nbsp; <span style="font-weight: bold;"></span>If
+you had any previous installations of Fedora Core on the server,
+Anaconda will detect them and ask you if you would like to conduct a
+fresh installation, or you would like to upgrade your existing version
+of Linux. Make your selection and press &lt;NEXT&gt; to
+continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>If you have an existing
+version of Fedora installed, choosing to install a fresh version will
+destroy the existing installation depending on your configuration
+choices.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+8.&nbsp;&nbsp;
+<span style="font-weight: bold;">Disk
+Partitioning Setup: </span>As part
+of our server planning considerations we should consider<span style="font-weight: bold;"></span> how we are going to
+partition the
+filesystem. If you are
+an experienced installer or you are doing an upgrade of some type, you
+may choose to partition your system manually. Otherwise choose
+"Remove all partitions on the selected drives and create default
+layout" and press &lt;NEXT&gt;. WARNING - This will delete all
+partitions currently on your server.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+Manual partitioning is outside the scope of this HOWTO, however you can
+select the "Review and modify partitioning layout" checkbox if you
+would like to manually configure or review your server's partitions;
+this is recommended.
+
+
+
+
+
+<br>
+<br>
+<span style="color: rgb(255, 0, 0);"></span>9.&nbsp;&nbsp;
+<span style="font-weight: bold;">Disk
+Setup:</span> This page allows you
+to review your new partitions and the filesystem types that have been
+automatically chosen by the installer. There are many options
+available here to fully customise your hard drives with your
+filesystem requirements, but if you are not familiar with
+partitioning, then the automatic configuration should be fine.
+
+
+
+
+
+
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+Make any changes that you need and select &lt;NEXT&gt; to
+continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+10.&nbsp;&nbsp; <span style="font-weight: bold;">Boot
+Loader Configuration:</span> To boot
+your system when its turned on, a small application needs to be
+installed in the Master Boot Record to tell the computer's BIOS where
+to continue loading the operating system files from, this is part of
+the bootstrap process. Fedora uses an application called GRUB (the
+GRand Unified Bootloader) for this process, and if you have a standard
+IDE hard drive configuration, the boot loader is normally installed
+on&nbsp;<span style="font-family: monospace;">"/dev/VolGroup00/LogVol00"</span>.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+As with step 1, the boot loader can pass extra parameters to the kernel
+during the boot process. If you need to pass any parameters at boot
+time and you would like to automate the process, then select "Configure
+advanced boot loader options". The GRUB configuration can be edited at
+a later time if needed.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+11.&nbsp;&nbsp; <span style="font-weight: bold;">Network
+Configuration:</span>
+This page allows us to
+configure the networking requirements of our server.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+Depending upon the network topology being implemented, we may either
+have one or two network devices to install. Remembering that <span style="font-family: monospace;">eth0</span>
+is
+connected to the external "Internet" connection; the&nbsp;side
+where hackers and nasty people lurk.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 240px;">Device:
+eth0
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">Parameters</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Activate on
+Boot
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Yes
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Configure
+with DHCP
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Yes
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+IP/Netmask
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>DHCP
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If there is a second network device (<span style="font-family: monospace;">eth1</span>),
+use the following
+parameters to
+configure the device.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 240px;">Device:
+eth1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">Parameters</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Activate on
+Boot
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Yes
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Configure
+with DHCP
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>No
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+IP Address
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>192.168.1.1
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Netmask
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>255.255.255.0
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+You now need to set the fully qualified hostname of the server and
+other
+miscellaneous settings, remembering to use the host and domain names
+applicable to your system.
+
+
+
+
+
+<br>
+<span style="font-weight: bold;"></span>
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 240px;">Description
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="font-weight: bold;">Value
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Hostname
+(manually)
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>galaxy.example.com
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Gateway
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Empty
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Primary DNS
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>&lt;Your ISPs DNS
+Server Address&gt;
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Secondary DNS
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Empty
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 240px;">&nbsp;-
+Tertiary DNS
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Empty
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>You will get an error at
+this point because we have not set a gateway address for the server,
+this will be addressed during later configurations. If you are using a
+static IP address for
+your external device and you already know your gateway address, you can
+enter these details now.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+12.&nbsp;&nbsp; <span style="font-weight: bold;">Time
+Zone Selection:</span> Use the image
+of the world map to select the required timezone in your nearest
+location. You may also choose (optional) to operate your server using
+the Universal Time Clock, however most people will operate using the
+time in the current location.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+13.&nbsp;&nbsp; <span style="font-weight: bold;">Set
+Root Password:</span> It is
+important to select a secure password for the super user using a
+mixture of upper and lower case letters, numbers, and special keyboard
+characters. The stronger and more complex your root password is, the
+less chance your system will fall victim to a brute force type attack.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+14.&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">Default
+Installation:</span> We are now going to select what programs and
+applications (packages) are going to be installed on our server, <span style="font-weight: bold;">remove
+all checkboxes</span> and select "Customise Now" to select individual
+packages. Select &lt;NEXT&gt; to continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+15.&nbsp;&nbsp; <span style="font-weight: bold;">Package
+Group Selection:</span> This is the
+point where we can tailor the installation to our specific needs by
+adding or removing certain applications and packages. This HOWTO was
+written to cover specific applications and services that best suits a
+typical small network, and the installation requires the following
+additional customisations to meet the server's package requirements.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>The following list
+details additions on top of the packages
+already chosen. Do not remove packages that are not listed.
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(219, 219, 219); width: 183px;"><span style="font-weight: bold;">Desktop Environments</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">GNOME
+Desktop Environment
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Selected by default
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">KDE
+(K
+Desktop Environment) </td>
+
+
+
+
+
+
+      <td>Add Tick - Defaults are Suitable
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1">&nbsp;</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(220, 220, 220); width: 183px;"><span style="font-weight: bold;">Applications</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Engineering and Scientific
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">Add
+Tick - Defaults are
+Suitable
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Graphical Internet</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>gftp</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>thunderbird</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Sound and Video</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>k3b</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>xcdroast</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 183px;" colspan="2" rowspan="1"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(220, 220, 220); width: 183px;"><span style="font-weight: bold;">Development</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Development Tools
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td>Add Tick - Defaults are Suitable
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="width: 225px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(220, 220, 220); width: 183px;"><span style="font-weight: bold;">Servers</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>DNS Name Server</td>
+
+
+
+
+
+
+      <td>Add Tick - Defaults are Suitable</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">FTP Server
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">Add Tick - Defaults are
+Suitable
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Mail Server</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>squirrelmail</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>MySQL Database</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>mod_auth_mysql</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>php_mysql</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Network Servers</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">&nbsp;-
+Additional
+Packages
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">dhcp</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">openldap-servers</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Server Configuration Tools
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>Select all (as required)</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Web Server</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>mod_auth_mysql</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>mod_authz_ldap</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>php_ldap</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+      <td></td>
+
+
+      <td>php_mysql</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 225px;">Windows
+File Server
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 183px;">Add Tick - Defaults
+are Suitable
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="width: 225px;"><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(220, 220, 220); width: 183px;"><span style="font-weight: bold;">Base System</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Base</td>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>authd</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>netconfig</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- <span style="font-weight: bold;">REMOVE PACKAGE</span></td>
+
+
+
+
+
+
+      <td>dhcpv6_client</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>System Tools</td>
+
+
+
+
+
+
+      <td>Add Tick</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>arpwatch</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>gnutls-utils</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>mrtg</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+      <td>net-snmp-utils</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>X Window System</td>
+
+
+
+
+
+
+      <td>&nbsp;</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;- Additional Packages</td>
+
+
+
+
+
+
+      <td>switchdesk</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="width: 225px;">&nbsp;
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td colspan="2" rowspan="1" style="background-color: rgb(220, 220, 220); width: 183px;"><span style="font-weight: bold;">Languages &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;- Select additional
+languages as required.</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Once you are satisfied with your selections you may
+continue.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+16.&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">About
+to
+Install:</span> If you have selected
+any additional packages and have
+triggered a "dependency error", select the option to install the
+required dependencies and continue the installation process.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+17.&nbsp;&nbsp; <span style="font-weight: bold;">Installation
+Stage:</span>
+The system will now go through the process of formatting your
+partitions and installing the selected packages. This stage may take a
+few minutes and is a good time for a break. If you are installing from
+the CD set, you will be required to change CD during the installation.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+18.&nbsp;&nbsp; <span style="font-weight: bold;">Installation
+Complete:</span>
+The DVD/CD will be automatically ejected from its drive once it has
+finished installing all the required packages, removed the media from
+the drive bay and select &lt;REBOOT&gt;.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+Congratulations, the majority of the installation has been completed
+and the server is almost ready for configuration.<br>
+
+<br>
+
+
+
+
+
+
+<h2><a name="posttasks"></a><a href="#top">Post
+Installation Tasks</a></h2>
+
+
+
+
+
+
+Once the Fedora Core operating system has been installed and the system
+has been rebooted, there are some minor configurations required before
+you can log into and start using the system. The firstboot process will
+now guide you throught the following steps.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+1.&nbsp;&nbsp; <span style="font-weight: bold;">Welcome:</span>
+Select
+&lt;FORWARD&gt; to start the post installation process.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+2.&nbsp;&nbsp; <span style="font-weight: bold;">License
+Agreement:</span>
+Read and accept the license agreement.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+3.&nbsp;&nbsp; <span style="font-weight: bold;">Firewall:</span>
+Accept the default firewall settings here, we will configure a more
+detailed firewall configuration later in <a href="06-Firewall_Concepts.html">Chapter 6</a>.<span style="font-weight: bold;"></span><br>
+<span style="font-weight: bold;">
+
+
+
+
+
+</span><br>
+<span style="font-weight: bold;">
+
+
+
+
+
+</span>4.&nbsp;&nbsp; <span style="font-weight: bold;">SELinux:</span>
+Select the appropriate SELinux settings for your server. If you are
+unsure here, select "permissive" and click &lt;FORWARD&gt;.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+5.&nbsp;&nbsp; <span style="font-weight: bold;">Date
+and Time:</span>
+Select the appropriate date and time for your server system, depending
+upon your earlier selection of either local or universal timezones.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>Do not enable Network
+Time Protocol yet, it will be
+configured in more detail later in <a href="09-Network_Time_Protocol.html">Chapter 9</a>.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+6.&nbsp;&nbsp; <span style="font-weight: bold;">Display:</span>
+Configure the X Windows Server with the appropriate settings for your,
+monitor type, display resolution and colour depth. Being a dedicated
+server it does not need the latest video drivers for 3D graphics.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+7.&nbsp;&nbsp; <span style="font-weight: bold;">System
+User:</span>
+Enter the details of your generic user account. It is recommended (and
+good practice) that you use a generic user account at all times, and
+only
+switch to the super user account when the higher privileges are
+needed for administrative tasks.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+8. &nbsp; <span style="font-weight: bold;">Sound Card:</span>
+Make the required adjustments for your soundcard and continue. Being a
+dedicated server it does not need a sound card at all, however you may
+be able to configure some basic sound files to some of your
+administrative tasks or alerts to give you a warning when certain
+events occur.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+9.&nbsp;&nbsp; <span style="font-weight: bold;">Finish
+Setup:</span>
+The entire installation process has now been completed, press
+&lt;NEXT&gt; to continue to the login screen.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>Automated Installation</h3>
+
+
+
+
+
+
+During the installation phase, the Anaconda system installer creates a
+"kickstart" configuration file containing all the settings used during
+your server's&nbsp;build phase. It details the partition types, network settings,
+packages to install, and pretty much everything that was covered
+throughout the last two sections. The kickstart file can be used to
+rebuild your entire system automatically, and is a good way to recover
+from a system failure.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Backup the configuration file to floppy disk, label it, and store the
+disk in a save location - hopefully you won't need to use it.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">[bash]#
+      <span style="font-weight: bold;">mcopy
+/root/anaconda-ks.cfg a:</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>You need to be logged in
+as root (after installation) to
+backup the kickstart config file.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To later rebuild your system using your kickstart configuration, you
+need to pass the following kernel parameters at the boot prompt. This
+will start an automatic installation process using your previous
+settings, and will stop only to prompt for partitioning information.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">boot:
+      <span style="font-weight: bold;">linux
+ks=hd:fd0/anaconda-ks.cfg</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+For further details on using kickstart and the different build options
+available, visit the <a href="http://www.redhat.com/docs/manuals/linux/RHL-9-Manual/custom-guide/part-install-info.html">Red
+Hat Kickstart Guide.</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>Setting
+Default X Windows</h3>
+
+
+
+
+
+
+When you log into your new server for the first time, the initial X
+Windows Manager that loads will be the GNOME&nbsp;Window Manager.
+You can change the default X
+Windows Manager display at the login screen by selecting the session
+tab and changing to the appropriate Window Manager.
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+The Window Manager can also be changed at the command line interface
+after logging in, by typing one of the following commands at the prompt:
+
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">[bash]#
+      <span style="font-weight: bold;">switchdesk gnome</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+or
+
+
+
+
+
+<table style="width: 100%; text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">[bash]#
+      <span style="font-weight: bold;">switchdesk kde</span>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Your default settings will now be saved, however you will need to
+restart the X Windows Server before the settings are applied. This can
+be done quickly by pressing <span style="font-family: monospace;">CTRL+ALT+BACKSPACE</span>.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="02-Planning_Considerations.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="04-Network_Configuration.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+</body>
+</html>

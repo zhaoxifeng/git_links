@@ -1,0 +1,4318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - MySQL Server</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="16-Secure_Shell.html">Previous</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="18-Samba.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 17 - MySQL Server</h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 140px; vertical-align: top;"><span style="font-weight: bold;">Versions:</span></td>
+
+
+
+
+
+
+
+      <td>- mysql-server 5.0.21<br>
+- mysql-administrator 1.1.6<br>
+- phpMyAdmin-2.8.1</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<a href="#initial">Initial Configuration</a><br>
+<a href="#rootpass">Setting Root Password</a><br>
+
+
+
+
+
+
+
+
+<a href="#webadmin">phpMyAdmin Web Administrator</a><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Databases are a great way to store information, they can store your
+personal contact list, your financial records, your household
+inventory, or even a listing of your favourite websites. Databases are
+able to store large amounts of useful information in a logical
+structure that allows for quick retrieval in any user defined format.
+Community libraries are renowned for their use of large database
+systems to store the mass amounts of usable information that they
+collect and share.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Databases also play a major role in todays web applications by storing
+complete inventories of products and services and making these
+accessible through a programmed web frontend. A database has the
+ability to provide dynamic content to a web shop by providing the
+content to web pages as an online shopper browses through the
+catalogue; a simple adjustment in the database can provide a 10%
+discount across the whole product line, instantly. Many Linux
+distributions implement PHP, MySQL, and Apache as a perfect combination
+for full featured dynamic web content.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+This chapter will provide guidance to establish your MySQL (<a href="http://www.mysql.com">http://www.mysql.com</a>) database server
+and also the steps necessary to configure a web based administration
+tool (phpMyAdmin) for remote management. This chapter will not be an
+introduction to the Structured Query Language (SQL), there are already
+many tutorials available on the Internet.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="initial"></a><a href="#top">Initial Configuration</a><br>
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+Configuring the server is not too difficult but one point to remember
+is there are three levels of configuration files, each having
+precedence over the following file. The main configuration file (<span style="font-family: monospace;">/etc/my.cnf</span>) contains all of
+the global options for the server, what ever is defined here will
+dominate the subordinate files. Likewise the server-specific
+configuration will dominate any user specified options, if the files
+exist.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The following table details the configuration files.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; background-color: rgb(255, 255, 255); width: 50px;">Order:<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; background-color: rgb(255, 255, 255); width: 180px;">File
+Location:<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; background-color: rgb(255, 255, 255); width: 652px;">Description:<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 50px;">1.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">/etc/my.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 652px;">For setting global options </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 50px;">2.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">/var/lib/mysql/my.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 652px;">For setting server-specific options </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 50px;">3.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">~/my.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 652px;">For setting user-specific options (if
+applicable) </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Depending on your Linux distribution your MySQL server may already be
+configured with a minimum configuration file and is ready to run,
+otherwise you may need to create a configuration file before the server
+can be activated. This is not a big problem as some sample
+configuration files have been provided that are already
+tuned to a particular purpose depending on the role of the server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(255, 255, 255); font-weight: bold; width: 180px;">Sample
+File:<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="background-color: rgb(255, 255, 255); font-weight: bold; width: 716px;">Used
+For:<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">my-huge.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 716px;">Large site, fully dedicated mysql
+server, 1-2GB RAM<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">my-large.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 716px;">Large site, mostly dedicated mysql
+server, ~512MB RAM<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">my-medium.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 716px;">Medium site, shared server running
+mysql,
+&gt; 64MB RAM<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">my-small.cnf</td>
+
+
+
+
+
+
+
+
+      <td style="width: 716px;">Small site, shared server running
+mysql, &lt; 64MB RAM<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td colspan="2" rowspan="1"><span style="font-weight: bold;">File
+Locations:</span> /usr/share/doc/mysql-server-<span style="font-weight: bold; text-decoration: underline;">?.??.??</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You need to check if you have the global options file (<span style="font-family: monospace;">/etc/my.cnf</span>) installed, if you
+don't have the file you should copy one of the sample files that best
+suits your requirements into that position, if you do have the global
+file then you should copy one of the sample files into the
+server-specific options location. Remember that we should backup the
+main configuration first if it exists.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp /etc/my.cnf /etc/my.cnf.original</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">cp /usr/share/doc/mysql-server-</span><span style="text-decoration: underline; font-weight: bold;">?.??.??</span><span style="font-weight: bold;">/my-small.cnf
+/var/lib/mysql/my.cnf</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Copy the sample file that best suits your system and
+requirements. A configuration that is over tuned for your system may
+waste resources unnecessarily.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Now that the configuration files are in place, the runlevels should be
+configured and checked. You should ensure that the runlevels match
+those of Apache if you are using the MySQL server as a backend to a
+dynamic website.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 345 mysqld on</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chkconfig
+--list mysqld</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The service can now be started and checked for initialisation errors.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/mysqld
+restart</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">tail /var/log/mysqld.log</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If this is the first time that you have started your server, it will
+automatically create some standard databases in the /var/lib/mysql
+directory. If these database directories do not exist or you received
+an error, then they can be manually created by typing "<span style="font-family: monospace;">mysql_install_db</span>" at the
+command prompt.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ls -l /var/lib/mysql</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>drwx------&nbsp;&nbsp; 2 mysql mysql 4096 Dec 22 04:41 mysql<br>
+
+
+
+
+
+
+
+
+srwxrwxrwx&nbsp;&nbsp; 1 mysql mysql&nbsp;&nbsp;&nbsp; 0 Dec 22 04:41
+mysql.sock<br>
+
+
+
+
+
+
+
+
+drwx------&nbsp;&nbsp; 2 mysql mysql 4096 Dec 22 04:41 test<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You can check the integrity of your new databases with the following
+command.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">mysqlcheck -A</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>mysql.columns_priv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OK<br>
+mysql.db&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OK<br>
+
+
+
+
+
+
+
+
+.<br>
+
+
+
+
+
+
+
+
+.&nbsp;&nbsp;&nbsp; *** Output Trimmed ***<br>
+
+
+
+
+
+
+
+
+.<br>
+mysql.time_zone_transition_type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OK<br>
+mysql.user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OK<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="rootpass"></a><a href="#top">Setting Root Password</a></h2>
+
+
+
+
+
+
+
+
+Your sql server should now be configured and running, however the
+initial setup creates a root user with a blank password which should be
+changed to protect your databases.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The system log also confirms that the server is running, and warns the
+user to change their root password.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]#&nbsp;<span style="font-weight: bold;">/etc/init.d/mysqld restart</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !<br>
+
+
+
+
+
+
+
+
+galaxy mysql_install_db: This is done with:<br>
+
+
+
+
+
+
+
+
+galaxy mysql_install_db: /usr/bin/mysqladmin -u root password
+'new-password'<br>
+
+
+
+
+
+
+
+
+galaxy mysql_install_db: /usr/bin/mysqladmin -u root -h
+galaxy.example.com&nbsp; password 'new-password'<br>
+
+
+
+
+
+
+
+
+galaxy mysql_install_db: See the manual for more instructions.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The sql root account should not be confused with the Linux system
+superuser account, it is only for access to the sql server so the
+passwords can be different if you need them to be. You should now
+select a suitable password and use the following commands to secure the
+root account. Remember to substitute <span style="font-weight: bold; font-family: monospace;">"NEW_ROOT_PASSWORD"</span> for your
+chosen password.<br>
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold; color: rgb(0, 0, 0);"></span><span style="font-weight: bold; color: rgb(0, 0, 0);"></span><span style="color: rgb(0, 0, 0);">[bash]# </span><span style="font-weight: bold; color: rgb(0, 0, 0);">mysql</span><span style="font-weight: bold; color: rgb(0, 0, 0);"> -u root</span>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <tr style="font-family: monospace;">
+      <td><strong class="userinput"><code></code></strong>mysql&gt; <strong class="userinput"><code>SET PASSWORD FOR 'root'@'localhost' = PASSWORD('<em class="replaceable"><code></code></em></code></strong><span style="text-decoration: underline; font-weight: bold;">NEW_ROOT_PASSWORD</span><strong class="userinput"><code><em class="replaceable"><code></code></em>');</code></strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="color: rgb(255, 0, 0); font-weight: bold;">&lt;-- change MySQL root&nbsp;password</span><br>
+mysql&gt; <strong class="userinput"><code>SET PASSWORD FOR 'root'@'galaxy.example.com'<em class="replaceable"><code></code></em> = PASSWORD('<em class="replaceable"><code></code></em></code></strong><span style="text-decoration: underline; font-weight: bold;">NEW_ROOT_PASSWORD</span><strong class="userinput"><code><em class="replaceable"><code></code></em>');</code></strong>&nbsp; &nbsp;&nbsp;<span style="color: rgb(255, 0, 0); font-weight: bold;">&lt;-- change MySQL root&nbsp;password</span><br>
+mysql&gt; <strong class="userinput"><code>quit</code></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+Now that the passwords have been configured for the root account, you
+will need
+to add the following command options to all your commands when using
+the mysql client, the client will then ask you for your password before
+granting
+access. See "<span style="font-family: monospace;">man mysql</span>"
+for more details.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">Now Need:</span>&nbsp; "-u
+root -p"<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">mysqladmin -u root -p variables<br>
+      </span>Enter password: </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+To view a list of all the user accounts within the "mysql" database
+table, use the following command, note that the passwords are stored as
+a message digest hash (secure algorithm) to prevent someone from simply
+"dumping" them out with this command.<br>
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td><span style="font-weight: bold;"></span>[bash]#&nbsp;<span style="font-weight: bold;">echo "select USER,HOST,PASSWORD from user" | mysql -u root -p -D mysql<br>
+      </span>Enter password:<span style="font-weight: bold;"></span>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>USER&nbsp;&nbsp;&nbsp; HOST&nbsp;&nbsp;&nbsp; PASSWORD<br>
+root&nbsp;&nbsp;&nbsp; localhost&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;31218f0c48d3e60f<br>
+root&nbsp;&nbsp;&nbsp;&nbsp;galaxy.example.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;31218f0c48d3e60f<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;galaxy.example.com<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; localhost<br>
+pma&nbsp;&nbsp;&nbsp;&nbsp;
+localhost&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3cf4e95402cfe1cd &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- added duing phpMyAdmin config</span><br>
+      <span style="font-weight: bold;"></span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+<h3>Graphical Administrator</h3>
+The extras yum respository has a "mysql-administrator" RPM that can be
+installed to assist in administering your new MySQL server through a
+graphical user interface. Type the following command at the prompt to
+install the administrator (this requires X Windows and a desktop
+manager to be installed).<br>
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">yum install mysql-admin* mysql-gui*</span><span style="font-weight: bold;"></span>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]#&nbsp;<span style="font-weight: bold;">mysql-administrator &amp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: rgb(255, 0, 0);">&lt;-- To execute GUI administrator</span></span>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="webadmin"></a><a href="#top">phpMyAdmin Web Administrator</a><br>
+
+
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+
+
+
+
+
+
+
+One of the easiest ways to interface and administer your SQL database
+is through a web application thats running on the local SQL server.
+phpMyAdmin is an opensource PHP based web application designed
+specifically to allow remote management of MySQL using nothing more
+that a standard web browser. The phpMyAdmin application provides an
+easy to use graphic interface for users that are not too familiar with
+SQL commands by providing easy to follow instructions. The package
+can be downloaded from the phpMyAdmin site (<a href="http://www.phpmyadmin.net">http://www.phpmyadmin.net</a>) and
+quickly installed on your local web/SQL server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Firstly we need to download the latest archive of phpMyAdmin and save
+it somewhere on the local server, the following example uses the gzip
+format. Use the following commands to extract the archive into the
+"/var/www" directory, remember to replace <span style="font-weight: bold; text-decoration: underline;">?.?.?</span>
+with the version number you have downloaded.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">tar -xzvf phpMyAdmin-</span><span style="text-decoration: underline; font-weight: bold;">?.?.?</span><span style="font-weight: bold;">.tar.gz
+-C /var/www/</span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chown -R root.root /var/www/phpMyAdmin-</span><span style="text-decoration: underline; font-weight: bold;">?.?.?</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Replace phpMyAdmin-<span style="font-weight: bold; text-decoration: underline;">?.?.?</span>
+with the version number that you are installing.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+The application has now been extracted and needs to be configured with
+the settings for the local MySQL server. phpMyAdmin will also interface
+into&nbsp;one of its own databases using an account called "pma" which
+we will create a little further on, however you will need to place a
+password into the configuration file for the pma account; remember it
+for later use.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+When you configured your Apache web server you created an SSL
+certificate and used the rewrite module to force SSL connections. It is
+recommended that you also force SSL on your phpMyAdmin application so
+that any logon details and database queries are executed
+confidentially. Ensure the '<span style="font-family: monospace;">PmaAbsoluteUri</span>'
+directive uses the HTTPS protocol if you intend using SSL, otherwise
+substitute it for the standard URL path.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /var/www/phpMyAdmin-</span><span style="text-decoration: underline; font-weight: bold;">?.?.?</span><span style="font-weight: bold;">/config.inc.php</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>&lt;?php<br>
+      <br>
+$cfg['PmaAbsoluteUri'] = 'https://www.example.com/mysql';<br>
+
+
+
+
+
+
+
+
+$cfg['PmaAbsoluteUri_DisableWarning'] = FALSE;<br>
+
+
+
+
+
+
+
+
+$cfg['PmaNoRelation_DisableWarning']&nbsp; = FALSE;<br>
+
+
+
+
+
+
+
+
+$cfg['blowfish_secret'] = '';<br>
+      <br>
+/* Start of servers configuration */<br>
+$i = 0;<br>
+      <br>
+/* Server localhost (config:root) [1] */<br>
+$i++;<br>
+$cfg['Servers'][$i]['host'] &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; = 'localhost';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['port']&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= '3306';<br>
+$cfg['Servers'][$i]['socket'] &nbsp; &nbsp; &nbsp; &nbsp;= '/var/lib/mysql/mysql.sock';<br>
+$cfg['Servers'][$i]['connect_type'] &nbsp;= 'socket';<br>
+$cfg['Servers'][$i]['extension'] &nbsp; &nbsp; = 'mysqli';<br>
+$cfg['Servers'][$i]['compress'] &nbsp; &nbsp; &nbsp;= &nbsp;false;<br>
+$cfg['Servers'][$i]['user'] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 'root';<br>
+$cfg['Servers'][$i]['password'] &nbsp; &nbsp;&nbsp; = '<span style="font-weight: bold; text-decoration: underline;">NEW_ROOT_PASSWORD</span>'; &nbsp; &nbsp;&nbsp;<span style="color: rgb(255, 0, 0); font-weight: bold;">&lt;-- change MySQL root&nbsp;password</span><br>
+$cfg['Servers'][$i]['auth_type'] &nbsp; &nbsp; = 'config';<br>
+$cfg['Servers'][$i]['controluser'] &nbsp; = 'pma';<br>
+$cfg['Servers'][$i]['controlpass'] &nbsp; = '<span style="font-weight: bold; text-decoration: underline;">PMA_PASSWORD</span>'; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span style="color: rgb(255, 0, 0); font-weight: bold;">&lt;-- change PMA password</span><br>
+$cfg['Servers'][$i]['pmadb']&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= 'phpmyadmin';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['bookmarktable'] = 'pma_bookmark';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['relation']&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+'pma_relation';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['table_info']&nbsp;&nbsp;&nbsp; = 'pma_table_info';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['table_coords']&nbsp; = 'pma_table_coords';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['pdf_pages']&nbsp;&nbsp;&nbsp;&nbsp; =
+'pma_pdf_pages';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['column_info']&nbsp;&nbsp; = 'pma_column_info';<br>
+
+
+
+
+
+
+
+
+$cfg['Servers'][$i]['history']&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+'pma_history';<br>
+      <br>
+/* End of servers configuration */<br>
+      <br>
+?&gt;<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Replace&nbsp; <span style="font-family: monospace; font-weight: bold;">"PMA_PASSWORD"</span>
+and <span style="font-family: monospace; font-weight: bold;">"NEW_ROOT_PASSWORD"</span>
+with the appropriate passwords for those accounts.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The local MySQL server now needs to be configured with the tables and
+access rights so phpMyAdmin can connect to it. These steps can vary
+depending upon the version of MySQL you are running, and may result in
+error if the wrong commands are issued. Use the following mysqladmin
+command below to confirm the version of MySQL you are using before
+continuing to configure the server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td><span style="color: rgb(255, 0, 0);"><span style="text-decoration: underline;"></span></span>[bash]# <span style="font-weight: bold;">mysqladmin
+-u root -p version</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+      <td>Server version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5.0.21<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You can now create the tables needed for phpMyAdmin depending on the
+server version you are running. You will need to enter your 'root'
+password when prompted (substituting <span style="font-weight: bold; text-decoration: underline;">?.?.?</span> where needed).<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+      <td><span style="color: rgb(255, 0, 0); font-weight: bold;">WARNING&gt;&gt;&gt;&gt;
+ONLY FOR SQL VERSIONS <span style="text-decoration: underline;">ABOVE
+4.1.2</span></span><br>
+
+
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">mysql -u root -p &lt; /var/www/phpMyAdmin-</span><span style="text-decoration: underline; font-weight: bold;">?.?.?</span><span style="font-weight: bold;">/scripts/create_tables_mysql_4_1_2+.sql</span>
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If the above command was successful you will now see the new database
+structure located in the servers data directory.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td><span style="color: rgb(255, 0, 0);"><span style="text-decoration: underline;"></span></span>[bash]# <span style="font-weight: bold;">ls -l
+/var/lib/mysql/</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+      <td>drwx------&nbsp; 2 mysql mysql 4096 Dec 22 02:50 mysql<br>
+
+
+
+
+
+
+
+
+srwxrwxrwx&nbsp; 1 mysql mysql&nbsp;&nbsp;&nbsp; 0 Dec 22 06:02
+mysql.sock<br>
+
+
+
+
+
+
+
+
+      <span style="font-weight: bold; color: rgb(255, 0, 0);">drwx------&nbsp; 2 mysql mysql
+4096 Dec 22 06:17 phpmyadmin</span><br>
+
+
+
+
+
+
+
+
+drwx------&nbsp; 2 mysql mysql 4096 Dec 22 02:50 test<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+We now need to use the mysql command line client to configure the
+correct access controls for the pma control account and database. The following
+commands can be cut and pasted into the mysql client when the "<span style="font-family: monospace;">mysql&gt;</span>" prompt is available.
+Remember to replace "<span style="font-family: monospace; font-weight: bold;">PMA_PASSWORD</span>"
+with the correct password.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+      <td style="width: 848px;" colspan="2" rowspan="1"><span style="color: rgb(255, 0, 0); font-weight: bold;">WARNING&gt;&gt;&gt;&gt;
+ONLY FOR SQL VERSIONS <span style="text-decoration: underline;">ABOVE
+4.1.2<br>
+
+
+
+
+
+      </span></span>[bash]# <span style="font-weight: bold;">mysql
+-u root -p</span><br>
+
+
+
+
+
+
+
+
+mysql&gt; _<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+  
+  
+  <tr style="font-weight: bold;">
+
+
+
+
+
+      <td style="width: 848px;" colspan="2" rowspan="1">GRANT USAGE ON mysql.* TO 'pma'@'localhost' IDENTIFIED BY '<span style="text-decoration: underline; color: rgb(255, 0, 0);">PMA_PASSWORD</span>'; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: rgb(255, 0, 0);">&lt;-- change PMA password</span><br>
+
+
+
+
+
+GRANT SELECT (<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; Host, User, Select_priv, Insert_priv, Update_priv, Delete_priv,<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; Create_priv, Drop_priv, Reload_priv, Shutdown_priv, Process_priv,<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; File_priv, Grant_priv, References_priv, Index_priv, Alter_priv,<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; Show_db_priv, Super_priv, Create_tmp_table_priv, Lock_tables_priv,<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; Execute_priv, Repl_slave_priv, Repl_client_priv<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; ) ON mysql.user TO 'pma'@'localhost';<br>
+
+
+
+
+
+GRANT SELECT ON mysql.db TO 'pma'@'localhost';<br>
+
+
+
+
+
+GRANT SELECT ON mysql.host TO 'pma'@'localhost';<br>
+
+
+
+
+
+GRANT SELECT (Host, Db, User, Table_name, Table_priv, Column_priv)<br>
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; ON mysql.tables_priv TO 'pma'@'localhost';<br>
+
+
+
+
+
+quit</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Replace&nbsp; "<span style="font-family: monospace;">PMA_PASSWORD</span>"
+with the appropriate password for the <span style="font-family: monospace;">pma</span> control account.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The tarball archive for the phpMyAdmin application was originally extracted
+into the "/var/www/phpMyAdmin-<span style="font-weight: bold; text-decoration: underline;">?.?.?</span>",
+while the Apache web server has its "<span style="font-family: monospace;">DocumentRoot</span>" directive set to "<span style="font-family: monospace;">/var/www/html</span>" which means the
+phpMyAdmin application is located outside of the "<span style="font-family: monospace;">DocumentRoot</span>" and the contents
+are not accessible directly by the web server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+We can create a configuration file for the phpMyAdmin application so
+Apache can access the resources that are required. The configuration
+below is using the <span style="font-family: monospace;">AuthType</span>
+directive ensuring that the access is restricted to only those users
+that have a valid username and password.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/httpd/conf.d/phpMyAdmin.conf</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>Alias /mysql "/var/www/phpMyAdmin-<span style="font-weight: bold; text-decoration: underline;">?.?.?</span>"<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+&lt;Location "/mysql"&gt;<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; AuthType Basic<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; AuthName "Private Area - MySQL Administrator"<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; AuthUserFile /etc/httpd/conf/authusers<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; AuthGroupFile /etc/httpd/conf/authgroups<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; Require group sqlusers<br>
+
+
+
+
+
+
+
+
+#&nbsp;&nbsp;&nbsp; Require valid-user<br>
+
+
+
+
+
+
+
+
+      &lt;/Location&gt;<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If you have created SSL certificates for your Apache web server, then
+you should force the phpMyAdmin application into SSL mode to keep it
+secure. This configuration uses the rewrite module configuration we
+created in <a href="13-Apache_Web_Server.html#sslcerts">Chapter 13</a>.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi /etc/httpd/conf.d/mod-rewrite.conf</span></td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>RewriteRule ^/mysql/(.*) https://%{SERVER_NAME}/mysql/$1
+[R,L] </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The Apache web server needs to be restarted before the settings will be
+used.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/httpd restart</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+If everything has gone well you should now be able to access the
+phpMyAdmin application on the local server at: <a href="https://localhost/mysql">https://localhost/mysql</a>.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+<span style="text-decoration: underline; font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;">Previous<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="18-Samba.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+</body>
+</html>

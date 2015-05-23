@@ -1,0 +1,2868 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Secure Shell</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="15-System_Printing.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="17-MySQL_Server.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<hr>
+<h1>Chapter 16 - Secure Shell<br>
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+
+      <td>- openssh 4.3p2</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+<a href="#sshdaemon"><span style="text-decoration: underline;">SSH
+Daemon</span></a><a href="16-Secure_Shell.html#initial"></a><br>
+
+
+
+
+
+
+<a href="#sshclient">Using SSH</a><br>
+
+
+
+
+
+
+<a href="#sftp">Secure File Transfers</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+One of the most important aspects of any networked computing system is
+the ability to fully administer it from a remote location as though you
+were sitting at the actual terminal. This saves an administrator any
+travel time to and from a site, where the time needed to complete a
+simple task may only be a minute or two; this is just not time
+effective. There are older style applications like telnet, rcp, and
+rlogin that addressed these issues, however these applications send all
+of the users authentication details and commands to the remote host in
+plain text, this is a major security risk.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<a href="http://www.openssh.org">OpenSSH</a> is a suite of replacement
+applications that provides an encrypted link between the administrators
+workstation and the remote host, this ensures that any login details
+and commands remain confidential. This chapter will explore some of the
+configuration settings for the SSH daemon and SSH client applications.
+It will also provide some information and commands for secure copy
+(scp) and sftp (secure
+ftp) which runs as a subsystem to the OpenSSH daemon.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="sshdaemon"></a><a href="#top">SSH
+Daemon</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+The SSH daemon acts as the 'server' that listens for, and handles
+incoming client connections. In its default configuration the daemon
+handles all the requirements for cryptographic key generation and
+rotation, so we are only going to be adjusting the operational
+parameters of the server here and not the keys. As with all our
+configuration files we need to make our backups before we proceed.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/ssh/sshd_config /etc/ssh/sshd_config.original</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/ssh/sshd_config</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+SSH operates on port 22 by default and listens on all networking
+devices, they can be adjusted here if you need to change them. The
+openssh daemon also supports versions 1 and 2 of the ssh protocol which
+are both normally loaded by default.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Version 1 of the SSH protocol is vulnerable to a known security exploit
+where an attacker may be able to insert malicious data into a secure
+link, it is therefore suggested that only protocol 2 be used for sshd,
+while protocol 1 be disabled.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Port 22<br>
+
+
+
+
+
+
+Protocol 2<br>
+
+
+#AddressFamily any<br>
+
+
+AddressFamily inet<br>
+
+
+#ListenAddress 0.0.0.0<br>
+
+
+
+
+
+
+#ListenAddress ::<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The following details are where the public and private cryptographic
+keys are stored for sshd, these are the default values and should not
+be adjusted unless you really know what you are doing.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td># HostKey for protocol version 1<br>
+
+
+
+
+
+
+#HostKey /etc/ssh/ssh_host_key<br>
+
+
+
+
+
+
+# HostKeys for protocol version 2<br>
+
+
+
+
+
+
+#HostKey /etc/ssh/ssh_host_rsa_key<br>
+
+
+
+
+
+
+#HostKey /etc/ssh/ssh_host_dsa_key<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The ssh daemon automatically regenerates its cryptographic key pairs
+every hour if they have been used, this ensures the keys are 'fresh'
+and prevents replay attacks from any captured data packets. The default
+key
+strength is 786 bits.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>KeyRegenerationInterval 1h<br>
+
+
+
+
+
+
+ServerKeyBits 1024<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The daemon should be configured to log all access attempts, good or bad.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>SyslogFacility AUTHPRIV<br>
+
+
+
+
+
+
+LogLevel INFO </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+By default the root account is allowed to use the ssh daemon for remote
+access, it is also the account that is the main focus of all external
+attacks against a site. It is highly advisable that you ban all root
+login privileges, particularly if the root password is weak and offers
+little protection. You would do better to create a single account for
+ssh access only, then switch to the root account after you have
+successfully authenticated with the server and gained access.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">LoginGraceTime</span>
+directive is the amount of time that a connected user has to
+login after establishing a connection to the server. If the user has
+not successfully logged in during this time they will be disconnected
+(default is 120s).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td><span style="font-weight: bold;">PermitRootLogin no</span><br>
+
+
+
+
+
+
+LoginGraceTime 30s<br>
+
+
+
+
+
+
+MaxAuthTries 4<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The following directives specify that only these users or groups are
+allowed to do remote logins. Only valid user and group names are
+permitted, while any numerical UID and GID representations will be
+ignored.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+By specifying either of the two 'allow' directives, all other user
+access will be denied unless explicitly listed here, comment these to
+allow all users access.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>AllowUsers sshconnect<br>
+
+
+
+
+
+
+AllowGroups sshusers<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Similar to 'allow', the deny directives specify which accounts are not
+allowed to access the server.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>DenyUsers alice bob<br>
+
+
+
+
+
+
+DenyGroups sshdeny<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+These specify that password authentication will be used, and empty
+passwords will be ignored. These are default settings.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>PasswordAuthentication
+yes<br>
+
+
+
+
+
+
+PermitEmptyPasswords no<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+The <span style="font-family: monospace;">AuthorizedKeysFile</span>
+directive identifies the filename located in each users home directory
+which is used to store their public key when accessing the server. You
+can assist users by creating the empty "<span style="font-family: monospace;">/etc/skel/.ssh/authorized_keys</span>"
+file so that newly created accounts have this file available if they
+need it.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>AuthorizedKeysFile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.ssh/authorized_keys </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+When users attempt to connect to the server the banner is displayed
+before they attempt to log into the system, this should be used to
+inform connecting users that all access is logged and any other legal
+details. You can also configure
+the server so the "message of the day" (/etc/motd) is displayed to the
+user after successful access is granted.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Banner /etc/ssh/banner<br>
+
+
+
+
+
+
+PrintMotd yes<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The sftp (SSH File Transfer Protocol) subsystem allows the copying of
+files between
+remote server and host workstation using the ssh daemons encryption
+system for security. Secure FTP and Secure copying are covered a little
+lower.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>Subsystem&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+sftp&nbsp;&nbsp;&nbsp; /usr/libexec/openssh/sftp-server</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+More configuration options and information can be obtained in the
+accompanying man pages, type "<span style="font-family: monospace;">man
+sshd</span>" and "<span style="font-family: monospace;">man sshd_config</span>"
+at the command prompt from further details.<br>
+
+
+
+
+
+
+<br>
+The "AcceptEnv" option allows&nbsp;sshd to export a users enviroment
+variables and setting from the server to the remote ssh client,
+examples are listed below.<br>
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES<br>
+
+
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT<br>
+
+
+AcceptEnv LC_IDENTIFICATION LC_ALL<br>
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>Starting The Server</h3>
+
+
+
+
+
+
+The service can now be set to the appropriate runlevels and checked to
+ensure they are correct.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig --level 2345 sshd on</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chkconfig --list sshd</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Its time to start the service and ensure there are no initialisation
+errors with the daemon.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/sshd restart</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">grep sshd /var/log/messages</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="sshclient"></a><a href="#top">Using SSH</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+The SSH client is obviously at the other end of the secure connection
+where the administrator (or general user) establishes the connection to
+log in from. Because this is only a home user howto, we will only look
+at the basics needed for logging in over the network. For further
+details on the SSH client type "<span style="font-family: monospace;">man
+ssh</span>" and "<span style="font-family: monospace;">man ssh_config</span>"
+at the command prompt. Remember if you need to log into your server
+from outside of your network (work etc..), you will need to open port
+22 in your firewall.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The first time you login into a remote server you will be warned that
+the identity of the host could not be established. If you are certain
+of the hosts identity, you can accept the cryptographic certificate
+which a copy of gets placed into your "<span style="font-family: monospace;">~/.ssh/known_hosts</span>" file in
+case you access the site again.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ssh alice@galaxy.example.com</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>The authenticity of host 'galaxy.example.com (192.168.1.1)'
+can't be established.<br>
+
+
+
+
+
+
+RSA key fingerprint is cd:3e:99:ef:5a:e6:6e:40:a4:25:79:a1:50:31:4b:7a.<br>
+
+
+
+
+
+
+Are you sure you want to continue connecting (yes/no)? yes<br>
+
+
+
+
+
+
+Warning: Permanently added 'galaxy.example.com' (RSA) to the list of
+known hosts.<br>
+
+
+
+
+
+
+alice@galaxy.example.com's password:<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+After you have successfully authenticated, you will be presented with a
+shell prompt for the remote host. You can now execute any command on
+the remote system as though you were sitting at the terminal. Be
+careful not to execute commands or change any firewall settings that
+may cause the remote system to close your connection.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+There may be occasion where the private RSA keys for the remote server
+are replaced. If this is the case then the public key which was earlier
+stored in your "<span style="font-family: monospace;">~/.ssh/known_hosts</span>"
+file will cause a conflict with the new public key. This will result in
+the client suspecting the server of a possible security attack.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ssh alice@galaxy.example.com</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br>
+
+
+
+
+
+
+@&nbsp;&nbsp;&nbsp; WARNING: REMOTE HOST IDENTIFICATION HAS
+CHANGED!&nbsp;&nbsp;&nbsp;&nbsp; @<br>
+
+
+
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@<br>
+
+
+
+
+
+
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!<br>
+
+
+
+
+
+
+Someone could be eavesdropping on you right now (man-in-the-middle
+attack)!<br>
+
+
+
+
+
+
+It is also possible that the RSA host key has just been changed.<br>
+
+
+
+
+
+
+The fingerprint for the RSA key sent by the remote host is<br>
+
+
+
+
+
+
+8e:ed:e3:45:50:5e:13:33:58:0e:d5:eb:e6:fc:ef:43.<br>
+
+
+
+
+
+
+Please contact your system administrator.<br>
+
+
+
+
+
+
+Add correct host key in /home/alice/.ssh/known_hosts to get rid of this
+message.<br>
+
+
+
+
+
+
+Offending key in /home/alice/.ssh/known_hosts:14<br>
+
+
+
+
+
+
+RSA host key for galaxy.example.com has changed and you have requested
+strict checking.<br>
+
+
+
+
+
+
+Host key verification failed.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The above warning message identifies the 'fingerprint' of the
+cryptographic keys has changed. You should always confirm any changes
+to a remote system before you fix this fault and continue to access the
+server.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+When you connect using a remote ssh session it is easy to forget which
+terminal window is connected to the remote server. This should always
+be checked whenever in doubt to prevent the wrong commands being sent
+to the wrong hosts. The session can be checked with the following
+simple command.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">uname -n</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>galaxy.example.com<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Type "<span style="font-family: monospace;">exit</span>" to close the
+remote connection.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>Windows Client</h3>
+
+
+
+
+
+
+The secure shell daemon provides platform independence, which means you
+are able to use a different type of operating system to access the
+server, assuming that the application supports the ssh protocols. PuTTY
+is a free SSH (and telnet) windows based client written and maintained
+by Simon Tatham, it provides similar functionality to the Linux client.
+The client and source code (if needed) are available for download here:
+<a href="http://www.chiark.greenend.org.uk/%7Esgtatham/putty">http://www.chiark.greenend.org.uk/~sgtatham/putty</a>.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+I recommend you download a copy of PuTTY and make it available on
+your FTP server, because that day will come when you need access to
+your system and the windows based client may prove quite useful if you
+are outside of your standard environment.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="sftp"></a><a href="#top">Secure
+File Transfers</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+The SSH daemon is able to run a subsystem of other applications which
+can take advantage of the secure environment provided by the
+cryptographic protocols, one of these subsystems is sftp (SSH File
+Transfer Protocol). The sftp server provides the ability for users and
+administrators to log in from remote systems so they can copy files in
+a confidential manner. Many ISPs now provide their users with some form
+of secure ftp so that their user details are secure when they log in to
+upload their public webpages. The access controls are inherited from
+the main sshd_config file.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The sftp server should not be confused with FTPS available in vsftpd,
+which is the original FTP with security extensions as discussed in <a href="14-FTP_Server.html">chapter 14</a>. Both systems are capable of
+providing a secure service and both offer different advantages about
+how they can be implemented. There is nothing wrong with having both
+systems running at the same time, then you can simply use the one that
+suits your needs the best.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To start sftp in interactive mode, type the following at the command
+prompt. This command would open an interactive SSH FTP session to the
+galaxy.example.com server for alice's account. See "<span style="font-family: monospace;">man sftp</span>" for further details.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">sftp alice@galaxy.example.com</span> </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Secure copy (scp) is a replacement to the older remote copy (rcp)
+application that allows files to be copied from one system to another
+in the same fashion as though you were copying files between
+directories on your own filesystem. The secure copy application allows
+for quicker non-interactive commands.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">scp filename alice@galaxy.example.com:/home/alice</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>Copy "filename" into alice's home directory on the remote
+galaxy.example.com server</li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">scp bob@galaxy.example.com:/home/bob/*
+/officeusers/bob</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>Copy all the files from bob's home directory on the remote
+galaxy.example.com server, to the local "/officeusers/bob" directory</li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">scp -r /home/alice/public_html/*
+alice@myisp.com:~/public_html</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>Recursively copy all of alice's public webpages on the local
+computer, to alice's public_html directory on the remote "myisp.com"
+server</li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">scp -r -P 1234 bob@remote.com:~/* /home/bob</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>Recursively copy all of bob's files from the remote.com server
+(on port 1234), to bob's home directory on the local computer</li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">scp -r superuser@wkstn1.example.com:/etc/*
+superuser@wkstn2.example.com:/etc/</span> </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+  <li>Recursively copy the contents of /etc directory from workstation1
+to workstation2 using a shared superuser account<br>
+  </li>
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>Windows Client</h3>
+
+
+
+
+
+
+Secure copy and SSH FTP also cater for platform independence as both
+allow for windows based applications to connect as the remote client.
+WinSCP is a freeware opensourced windows based SCP and SFTP client and
+allows for easy transfer between windows platforms and SSH servers. The
+WinSCP application is available for download at <a href="http://winscp.sourceforge.net">http://winscp.sourceforge.net</a>.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="15-System_Printing.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="17-MySQL_Server.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+</body>
+</html>

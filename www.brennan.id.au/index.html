@@ -1,0 +1,1987 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;">Linux
+Home Server HOWTO</span>
+</div>
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;">Previous</td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;">&nbsp;Home
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="01-Introduction.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<hr>
+<h1>Linux Home Server
+HOWTO<br>
+
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+
+<h2> &copy; Miles Brennan, <a href="mailto:%22howto%20%28at%29%20brennan%20.%20id%20.%20au%22?subject=Linux%20Home%20Server%20HOWTO">howto
+(at) brennan . id . au</a></h2>
+
+
+
+
+
+
+
+<h3><span style="font-weight: bold;">Revision
+History:</span></h3>
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">&nbsp; &nbsp;
+- Version: FC5 - 1.0</td>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">18 June,
+2006</td>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Updated by: Miles
+Brennan</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td colspan="3" rowspan="1">
+      
+      
+      
+      
+      
+      
+      <ul style="list-style-type: disc;">
+
+
+
+
+
+
+
+        <li><span style="font-weight: bold; color: rgb(0, 0, 238);">Updated
+whole site to suit Fedora Core 5</span> specific
+configurations.</li>
+
+
+
+
+
+
+
+        <li>Added&nbsp;SSL/TLS link encryption configurations
+for IMAPS, SMTP, L2TP (VPN) and LDAP protocols.</li>
+
+
+
+
+
+
+
+        <li>Added Dynamic DNS / DHCP configuration for server.</li>
+
+
+
+
+
+
+
+        <li><span style="color: rgb(255, 0, 0); font-weight: bold;">Adding</span> VPN, MRTG and System Backup chapters (<span style="color: rgb(255, 0, 0); font-weight: bold;">currently
+drafting</span>).</li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">&nbsp;
+&nbsp; - Version: FC3 - 0.01<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">21 November, 2004<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Authored by: Miles
+Brennan<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td rowspan="1" colspan="3">
+      
+      
+      
+      
+      
+      
+      <ul>
+
+
+
+
+
+
+
+        <li>First&nbsp;version of the Linux Home Server
+HOWTO, published for <span style="font-weight: bold; color: rgb(0, 0, 238);">Fedora
+Core 3</span><span style="color: rgb(0, 0, 0);">.</span></li>
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      </ul>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table align="center" border="0" cellpadding="2" cellspacing="0" width="740">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td colspan="1" rowspan="1" style="width: 146px;">
+      
+      
+      
+      
+      
+      <h3><strong>&nbsp; Powered By:</strong></h3>
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      
+
+      <td rowspan="1">
+      
+      
+      
+      
+      
+      
+      <div align="center"><a href="http://httpd.apache.org/"><img style="border: 0px solid ; width: 259px; height: 32px;" alt="Powered By Apache 2.2 !" src="images/apache_pb2.gif"></a></div>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td rowspan="1">
+      
+      
+      
+      
+      
+      
+      <div align="center"><a href="http://fedora.redhat.com/"><img style="border: 0px solid ; width: 88px; height: 31px;" alt="Powered By Fedora Core 5 !" src="images/powered_by_fedora.png"></a></div>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      
+
+      
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<hr>
+<div style="text-align: left;">This
+HOWTO will explore the concepts and
+configurations for establishing
+a fully functional
+Internet connected
+network environment for your home or small office. This setup
+uses&nbsp;a dedicated Linux server as the gateway device to
+provide all of your network connections, Web / Email / FTP servers,
+packet filtering firewall, and most of the other
+services required to configure and secure&nbsp;a complete small
+scale network.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+This documentation is&nbsp;developed specifically for the Fedora
+Core
+versions of Linux, however the configurations will still be suited to
+most Linux distributions that use the same applications and
+configuration settings.<br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<hr>
+<h2><a name="toc1"></a>1.&nbsp;&nbsp;
+<a href="01-Introduction.html">Introduction</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#about"><span style="font-weight: bold;"></span></a><a href="01-Introduction.html#about">About
+This HOWTO</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#assumptions">Reader
+Assumptions</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#feedback">Providing
+Feedback</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#conventions">Document
+Conventions</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#thanks">Acknowledgments
+and Thanks</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#copyright">Copyright
+Notice</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#trademarks">Registered
+Trademarks</a><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc2"></a>2.&nbsp;&nbsp;
+<a href="02-Planning_Considerations.html">Planning
+Considerations</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="01-Introduction.html#about"><span style="font-weight: bold;"></span></a><a href="02-Planning_Considerations.html#aup">Your
+ISP's Acceptable Use Policy</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="02-Planning_Considerations.html#requirements">Server
+Requirements</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="02-Planning_Considerations.html#domainname">Internet
+Domain Name</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="02-Planning_Considerations.html#topology">Network
+Topology</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc3"></a>3.&nbsp;&nbsp;
+<a href="03-Installing_Linux.html">Installing
+Linux</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="03-Installing_Linux.html#checklist">Pre-Installation
+Requirements (Checklist)</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="03-Installing_Linux.html#install">Installation
+Procedure (Step by Step Guide)</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="03-Installing_Linux.html#posttasks">Post
+Installation Tasks</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc4"></a>4.&nbsp;&nbsp;
+<a href="04-Network_Configuration.html">Network
+Configuration</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#drivers"><span style="text-decoration: underline;">Loading
+the Drivers</span></a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#internal">Internal
+Network Device</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#external">External
+Network Device</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#starting">Starting
+the Interfaces</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#routing">IP
+Routing Table</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="04-Network_Configuration.html#zeroconf">ZEROCONF</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc5"></a>5.&nbsp;&nbsp;
+<a href="05-Broadband_Connectivity.html">Broadband
+Connectivity</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="05-Broadband_Connectivity.html#ethernet">Ethernet
+Modems</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="05-Broadband_Connectivity.html#pppoe">PPPoE
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="05-Broadband_Connectivity.html#ddnsservices">Dynamic
+DNS Services</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="05-Broadband_Connectivity.html#ddnsauto">Dynamic
+DNS Automation</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc6"></a>6.&nbsp;&nbsp;
+<a href="06-Firewall_Concepts.html">Firewall
+Concepts</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#forwarding">Packet Forwarding</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#filtering">Packet
+Filtering</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#nat">Network
+Address Translation</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#snat">Source
+NAT</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#masquerading">IP
+Masquerading</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#dnat">Destination
+NAT</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="06-Firewall_Concepts.html#examplescript">Example
+Firewall Script</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc7"></a>7.&nbsp;&nbsp;
+<a href="07-Package_Management.html">Package
+Management</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="07-Package_Management.html#yum">Yum Update
+Manager</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="07-Package_Management.html#mirror">Changing
+Your Mirror</a><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc8"></a>8.&nbsp;&nbsp;
+<a href="08-Domain_Name_System_BIND.html">Domain
+Name System (BIND)</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#initial">Initial
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#options">Setting
+Daemon Options</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#yourdomain">Adding
+Your Domain</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#starting">Starting
+BIND</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#testing">Testing
+The Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="08-Domain_Name_System_BIND.html#dynamic_dns">Configuring
+Dynamic DNS</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc9"></a>9.&nbsp;&nbsp;
+<a href="09-Network_Time_Protocol.html">Network
+Time Protocol</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="09-Network_Time_Protocol.html#initial">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="09-Network_Time_Protocol.html#starting">Starting
+the Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="09-Network_Time_Protocol.html#clients">Client
+Configuration</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc10"></a>10.&nbsp;&nbsp;
+<a href="10-DHCP_Server.html">DHCP
+Server</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="10-DHCP_Server.html#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="10-DHCP_Server.html#setfixed">Setting
+Fixed Addresses</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="10-DHCP_Server.html#options">Setting
+Daemon Options</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="10-DHCP_Server.html#starting">Starting
+DHCP</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="10-DHCP_Server.html#testing">Testing
+The Server</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc11"></a>11.&nbsp;&nbsp;
+<a href="11-Squid_Web_Proxy.html">Squid
+Web Proxy</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="11-Squid_Web_Proxy.html#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="11-Squid_Web_Proxy.html#starting">Starting
+The Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="11-Squid_Web_Proxy.html#access">Setting
+Access Controls</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="11-Squid_Web_Proxy.html#authenticate">Authenticating
+Users</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="11-Squid_Web_Proxy.html#transparent">Configuring a
+Transparent Proxy</a><br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc12"></a>12.&nbsp;&nbsp;&nbsp;
+<a href="12-Sendmail_Server.html">Sendmail
+Server</a><span style="color: rgb(255, 0, 0);"></span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#dovecot">Dovecot IMAP Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#starting">Starting
+The Services</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#prev_abuse">Preventing Abuse</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#encryption">Full SSL/TLS
+Encryption</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#antivirus">Clam Antivirus</a><a href="12-Sendmail_Server.html#clamav-milter"></a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="12-Sendmail_Server.html#spam">SpamAssassin</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc13"></a>13.&nbsp;&nbsp;
+<a href="13-Apache_Web_Server.html">Apache
+Web Server</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#starting">Starting
+the Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#favicon">Creating a Favicon</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#users">User
+Directories</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#cgi">Enabling
+CGI Scripts</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#authentication">Authenticating
+Users</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#vhosts">Virtual
+Hosts</a><br>
+
+
+
+
+
+
+
+<a href="13-Apache_Web_Server.html#sslcerts"><span style="text-decoration: underline;"></span></a><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#sslcerts">Using
+SSL Certificates</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="13-Apache_Web_Server.html#webmail">Webmail
+Configuration</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc14"></a>14.&nbsp;&nbsp;
+<a href="14-FTP_Server.html">FTP
+Server</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="14-FTP_Server.html#config">Initial
+Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="14-FTP_Server.html#starting">Starting
+The Server</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="14-FTP_Server.html#control">Controlling
+User Access</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="14-FTP_Server.html#secure">Enabling
+TLS/SSL Encryption</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc15"></a>15. &nbsp; <a href="15-System_Printing.html">System
+Printing</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="15-System_Printing.html#config">Configuring
+CUPS</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="15-System_Printing.html#addprinter">Adding
+CUPS Printers</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="15-System_Printing.html#installdriver">Installing
+The Driver File</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc16"></a>16.&nbsp;&nbsp;
+<a href="16-Secure_Shell.html">Secure
+Shell</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="16-Secure_Shell.html#sshdaemon"><span style="text-decoration: underline;">SSH
+Daemon</span></a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="16-Secure_Shell.html#sshclient">Using SSH</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="16-Secure_Shell.html#sftp">Secure File Transfers</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc17"></a>17.&nbsp;&nbsp;
+<a href="17-MySQL_Server.html">MySQL
+Server</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="17-MySQL_Server.html#initial">Initial Configuration</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="17-MySQL_Server.html#rootpass">Setting Root Password</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="17-MySQL_Server.html#webadmin">phpMyAdmin Web
+Administrator</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc18"></a>18.&nbsp;&nbsp;
+<a href="18-Samba.html">Samba</a></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#global">Setting Global Options</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#useraccounts">Creating User Accounts</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#shareddirs">Sharing Network Directories</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#addprns">Adding Network Printers</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#winclient">The Microsoft Client</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-weight: bold;"></span><a href="18-Samba.html#smbclient">The Samba Client</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc19"></a>19.&nbsp;&nbsp;&nbsp;
+<a href="19-Network_File_System.html">Network File System</a><span style="color: rgb(255, 0, 0);"></span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="19-Network_File_System.html#export">Setting the </a><a href="19-Network_File_System.html#export"><span style="color: rgb(255, 0, 0); font-weight: bold;"></span><span style="font-weight: bold;"></span></a><a href="19-Network_File_System.html#export">Exports</a><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="19-Network_File_System.html#starting">Starting and Testing</a><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="19-Network_File_System.html#setvers">Selecting the Server Version</a><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="19-Network_File_System.html#import">Imports and Mounting</a><br>
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="19-Network_File_System.html#nfs4">NFS Version 4</a>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc20"></a>20.&nbsp;&nbsp;
+<a href="20-Shared_Address_Book_LDAP.html">Shared
+Address Book (LDAP)</a><span style="color: rgb(255, 0, 0);"></span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#concepts">Initial Concepts</a><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#addentries">Address
+Book Entries</a><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#encryption">TLS Link Encryption</a><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#phpldapadmin">phpLDAPadmin
+Web Administrator</a><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;">-&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="20-Shared_Address_Book_LDAP.html#clients">Email
+Client Settings</a>
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc21"></a>21.&nbsp;&nbsp;&nbsp;Virtual Private
+Networking<span style="color: rgb(255, 0, 0);">&nbsp;
+&nbsp; &nbsp; (DRAFTING)</span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;">- TODO - Draft Status
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc22"></a>22.&nbsp;&nbsp;&nbsp;Multi Router Traffic
+Grapher<span style="color: rgb(255, 0, 0);">&nbsp;
+&nbsp; &nbsp; (DRAFTING)</span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;">- TODO - Draft Status
+</div>
+
+
+
+
+
+
+
+<h2><a name="toc23"></a>23.&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">System Backup</span><span style="color: rgb(255, 0, 0);">&nbsp; &nbsp;
+&nbsp; (DRAFTING)</span></h2>
+
+
+
+
+
+
+
+<div style="margin-left: 40px;">- TODO - Draft Status<br>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;">Previous<br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;">Home
+      </td>
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="01-Introduction.html">Next</a><br>
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+</body>
+</html>

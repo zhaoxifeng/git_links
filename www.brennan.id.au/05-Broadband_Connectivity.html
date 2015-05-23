@@ -1,0 +1,6074 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Broadband Connectivity</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="04-Network_Configuration.html">Previous</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="06-Firewall_Concepts.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 5 - Broadband
+Connectivity<br>
+
+
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+
+
+<a href="#ethernet"><span style="color: rgb(255, 0, 0); font-weight: bold;"></span>Ethernet
+Modems</a><br>
+
+
+
+
+
+
+
+
+<a href="#pppoe">PPPoE
+Configuration</a><br>
+
+
+
+
+
+
+
+
+<a href="#ddnsservices">Dynamic
+DNS Services</a><br>
+
+
+
+
+
+
+
+
+<a href="#ddnsauto">Dynamic
+DNS Automation</a><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Its now time to plug in our modem and dial up the information super
+highway, look out Internet here we come. While we are inside this
+chapter, we will also explore the concepts of Dynamic DNS and how it
+can be automated for users that have Dynamic IP accounts.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Detailed technical
+aspects of individual modems will not be
+covered here,
+please consult your user manual for information on key modem settings.
+If the modem came preconfigured from your ISP, please contact them for
+any technical assistance.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="ethernet"></a><a href="#top">Ethernet
+Modems</a></h2>
+
+
+
+
+
+
+
+
+The most typical Internet connection type for home users is by means of
+a modem, whether it be dialup, ethernet, cable, or wireless, the
+concepts are all virtually the same. Today's modems are quite advanced
+and come with many neat security features to help protect the average
+user from the everyday threats out on the Internet.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Broadband modems generally operate in two different modes, that of
+'bridged' or 'routed'.<br>
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+  <li>In routed mode the modem is
+configured to connect to the ISP, and
+the IP address which is allocated to the broadband account is provided
+to
+the modem. The modem is also connected to the computer on a separate
+internal network which it shields from the Internet. The modem acts as
+a router.<br>
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+  <li>In bridged mode the modem
+opens a virtual tunnel to the ISP and
+the host computer dials a PPP connection over that virtual link. The modem
+operates as a dumb device while the host computer handles the
+connection and the related security for the Internal hosts across the
+link. The modem provides a link and the connection is established
+between the computer and ISP. The IP address is allocated to the
+computer, normally via the ppp0 device.<br>
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+There are pros and cons about both connection types, particularly if it
+is a modem router which is capable of stateful packet inspection and
+maintaining a secure state for the hosts on the private network. This
+HOWTO will concentrate on the bridging type connection, and provide the
+means for your server to establish, maintain and secure its own
+connection.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+To connect to an ethernet modem the server must be fitted with a second
+ethernet device; common practice is to identify your "external" public network interface as <span style="font-family: monospace;">eth0</span> (this is also consistent with this HOWTO's documentation).
+The ethernet
+device will be configured and controlled the same way as described in
+the previous chapter, with one minor difference being the protocol type
+assigned to the device. The ethernet device (and modem) are only
+maintaining a virtual tunnel over which the PPP link will travel, so it
+needs to be configured with <span style="font-family: monospace;">BOOTPROTO=none</span>
+parameter.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/sysconfig/network-scripts/ifcfg-eth0</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td># External Ethernet
+Device (BRIDGED MODE - NO PROTOCOL)<br>
+
+
+
+
+
+
+
+
+DEVICE=eth0<br>
+
+
+
+
+
+
+
+
+TYPE=Ethernet<br>
+
+
+
+
+
+
+
+
+ONBOOT=yes<br>
+
+
+
+
+
+
+
+
+USERCTL=no<br>
+
+
+
+
+
+
+
+
+BOOTPROTO=none&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- No protocol defined here.</span><br>
+
+
+
+
+
+
+
+
+PEERDNS=no<br>
+
+
+
+
+
+
+
+
+HWADDR=00:00:21:E0:B8:B9<br>
+
+
+
+
+
+
+
+
+IPV6INIT=no<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>After
+the ethernet device has been configured to operate in bridged mode, use
+some
+ethernet cable to connect the modem to the <span style="font-family: monospace;">eth0</span>
+device. The modem should be able to connect to the exchange (or cable
+service), however the link still needs to be configured with the PPPoE
+settings.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>When the ethernet <span style="font-family: monospace;">"eth0"</span> device
+is
+brought to the active state it will not be
+allocated (or broadcast for) an IP address and therefore not appear in
+the routing table as it is in "bridged" mode. </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<h2><a name="pppoe"></a><a href="#top">PPPoE
+Configuration</a></h2>
+
+
+
+
+
+
+
+
+When you connect to the Internet using an old style dialup modem, your
+computer communicates over the telephone system and back to your ISP
+using PPP (Point-to-Point Protocol). The broadband system is virtually
+the same but now your computer uses PPPoE (Point-to-Point Protocol over
+Ethernet) which is a modified version designed for the newer broadband
+specifications.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<a href="http://www.roaringpenguin.com/">Roaring
+Penguin</a> provides a free Linux
+PPPoE client that is already installed
+as a base package in many distributions. The PPPoE client is ideally suited to USB and
+ethernet (bridged
+mode) modems where a virtual link has already been established by the
+modem, and the
+PPPoE client handles the remaining dialup and authentication
+functions over that link. When an ethernet modem connects using the
+routed
+mode, it does so by using a similar PPPoE client preconfigured at the
+modem.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The PPPoE configuration file is stored in the same location with the
+other
+networking device files, however it is slightly more detailed than the
+other files, as shown below.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/sysconfig/network-scripts/ifcfg-ppp0</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>TYPE=xDSL<br>
+
+
+
+
+
+
+
+
+DEVICE=ppp0<br>
+
+
+
+
+
+
+
+
+PROVIDER=ppp0<br>
+
+
+
+
+
+
+
+
+USER='username@myisp.com'<br>
+
+
+
+
+
+
+
+
+ONBOOT=yes<br>
+
+
+
+
+
+
+
+
+DEMAND=no<br>
+
+
+
+
+
+
+
+
+USERCTL=no<br>
+
+
+
+
+
+
+
+
+PERSIST=yes<br>
+
+
+
+
+
+
+
+
+PEERDNS=no<br>
+
+
+
+
+
+
+
+
+DEFROUTE=yes<br>
+
+
+
+
+
+
+
+
+ETH=eth0<br>
+
+
+
+
+
+
+
+
+BOOTPROTO=dialup<br>
+
+
+
+
+
+
+
+
+FIREWALL=NONE<br>
+
+
+
+
+
+
+
+
+PING=.<br>
+
+
+
+
+
+
+
+
+PPPOE_TIMEOUT=80<br>
+
+
+
+
+
+
+
+
+LCP_INTERVAL=20<br>
+
+
+
+
+
+
+
+
+LCP_FAILURE=3<br>
+
+
+
+
+
+
+
+
+CONNECT_TIMEOUT=60<br>
+
+
+
+
+
+
+
+
+CONNECT_POLL=6<br>
+
+
+
+
+
+
+
+
+CLAMPMSS=1412<br>
+
+
+
+
+
+
+
+
+SYNCHRONOUS=no<br>
+
+
+
+
+
+
+
+
+PIDFILE=/var/run/pppoe-adsl.pid<br>
+
+
+
+
+
+
+
+
+IPV6INIT=no<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 140px;">Parameter<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Details<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">DEVICE<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>The logical name for the
+PPP device<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">PROVIDER<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>A friendly name for the
+ISP<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">USER<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>The ISP account username
+(password is specified in separate
+file)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">ONBOOT<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Specifies whether the
+devices should start when the system
+starts (depending on network service) </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">USERCTL<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Directs that only root,
+or all system users can control the
+device </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">PERSIST<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Will attempt to redial
+the connection if the link is
+disconnected<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">PEERDNS<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Import the DNS <span style="font-family: monospace;">nameserver</span>
+settings into /etc/resolv.conf (careful if running own DNS) </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">DEFROUTE<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Sets the device as the
+default gateway<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">ETH<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>Tells PPPoE client which
+network device to use<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-family: monospace; background-color: rgb(220, 220, 220); width: 140px;">BOOTPROTO<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td>The protocol type used
+to initialise the device (static |
+dhcp | none) </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Now that the PPPoE connection is configured, the authentication details
+for the account need to be stored so the client can automate the login
+process.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You should notice in the credentials file below, that the <span style="font-family: monospace;">USER</span>
+and <span style="font-family: monospace;">PROVIDER</span>
+details specified in
+the above configuration file are provided as the first two fields in
+the file. This binds the details together so the PPPoE client knows
+which details belong to which ISP connection (it is possible to have
+multiple
+PPP connections listed here).<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/ppp/pap-secrets</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>"username@myisp.com"&nbsp;&nbsp;&nbsp;&nbsp;
+"ppp0"&nbsp;&nbsp;&nbsp;&nbsp; "YOUR_ISP_PASSWORD"<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+As with any authentication credentials, they should be kept secure
+from unauthorised access. This is more so if the server is accessible
+by other system users.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chmod 600
+/etc/ppp/pap-secrets</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The PPPoE client implementation also uses a small server application
+that listens for discovery frames from the remote connection. The
+following settings are required for the pppoe-server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/ppp/pppoe-server-options</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>require-pap<br>
+
+
+
+
+
+
+
+
+login<br>
+
+
+
+
+
+
+
+
+lcp-echo-interval 10<br>
+
+
+
+
+
+
+
+
+lcp-echo-failure 2<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The PPPoE configuration is now completed and the connection is
+ready to be tested. It is assumed that your modem is properly connected
+and if an ethernet modem is being used, that the extra network device (<span style="font-family: monospace;">eth0</span>)
+is also configured and
+ready.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The easiest way to test the interface is to restart the networking
+service, which will test all of the devices by stopping and then
+starting them using the initscripts.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td> [bash]# <span style="font-weight: bold;">/etc/init.d/network
+restart</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+By checking the syslog you should be able to see if the connection was
+successful. If the connection was not successful, you should be
+provided with some error messages. Below is a successful connection.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td> [bash]# <span style="font-weight: bold;">tail
+/var/log/messages</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>galaxy network: Bringing
+up interface eth1:&nbsp; succeeded<br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: pppd 2.4.2 started by root, uid 0<br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: Using interface ppp0<br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: Connect: ppp0 &lt;--&gt; /dev/pts/4<br>
+
+
+
+
+
+
+
+
+galaxy pppoe[10191]: PPP session is 5036<br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: CHAP authentication succeeded<br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: local&nbsp; IP address
+      <span style="font-weight: bold;">xxx.xxx.xxx.xxx</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- Your DHCP Address</span><br>
+
+
+
+
+
+
+
+
+galaxy pppd[10190]: remote IP address 202.154.95.169<br>
+
+
+
+
+
+
+
+
+galaxy network: Bringing up interface ppp0:&nbsp; succeeded<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Specific connection details of the <span style="font-family: monospace;">ppp0</span>
+device can also be
+provided with the <span style="font-family: monospace;">ifconfig</span>
+command. This should identify the local (your) IP address, the remote
+IP address and other details like connection statistics.<br>
+
+
+
+
+
+
+
+
+<span style="font-family: monospace;"></span><br>
+<span style="font-family: monospace;">
+
+
+
+
+
+
+
+</span><br>
+<span style="font-family: monospace;">
+
+
+
+
+
+
+
+</span>
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td> [bash]# <span style="font-weight: bold;">ifconfig ppp0</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>ppp0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link
+encap:Point-to-Point
+Protocol<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+inet
+addr:<span style="font-weight: bold;">xxx.xxx.xxx.xxx</span>&nbsp; P-t-P:202.154.95.169&nbsp;
+Mask:255.255.255.255<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UP POINTOPOINT
+RUNNING NOARP MULTICAST&nbsp; MTU:1492&nbsp; Metric:1<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RX packets:2753
+errors:0 dropped:0 overruns:0 frame:0<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TX packets:2636
+errors:0 dropped:0 overruns:0 carrier:0<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+collisions:0
+txqueuelen:3<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RX bytes:1470035
+(1.4 Mb)&nbsp; TX bytes:472461 (461.3 Kb)<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The device can be manually controlled with the following commands,
+these should start to look familiar now as you use them often to
+control your connections.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]#&nbsp;<span style="font-weight: bold;">ifup
+ppp0</span><br>
+
+
+
+
+
+
+
+
+[bash]#&nbsp;<span style="font-weight: bold;">ifdown ppp0</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Now that we are finally connected to the Internet we need to make sure
+we can send data using the link. Remember the configuration parameter
+we earlier used called <span style="font-family: monospace;">DEFROUTE=yes</span>,
+well that attribute should have placed a default gateway into the
+routing table when the ppp0 device connected, this now allows any
+packets that are not destined for the private network to be routed out
+to the Internet when the device is connected.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td> [bash]# <span style="font-weight: bold;">route -n</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>Kernel IP routing table<br>
+
+
+
+
+
+
+
+
+Destination&nbsp;&nbsp;&nbsp;&nbsp;
+Gateway&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Genmask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Flags Metric
+Ref&nbsp;&nbsp;&nbsp; Use Iface<br>
+
+
+
+
+
+
+
+
+202.154.95.169&nbsp;
+0.0.0.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+255.255.255.255
+UH&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0
+ppp0&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- Remote Interface</span><br>
+
+
+
+
+
+
+
+
+192.168.1.0&nbsp;&nbsp;&nbsp;&nbsp;
+0.0.0.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+255.255.255.0&nbsp;&nbsp;
+U&nbsp;&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0 eth1<br>
+
+0.0.0.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+202.154.95.169&nbsp;
+0.0.0.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UG&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0
+ppp0&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- Default Gateway</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>The <span style="font-family: monospace;">eth0</span>
+device
+does not get listed in the routing table, it is only providing a virtual connection
+for the <span style="font-family: monospace;">ppp0</span>
+link to
+cross.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>
+<br>
+
+
+
+
+
+
+
+
+<h2><a name="ddnsservices"></a><a href="#top">Dynamic DNS
+Services</a></h2>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>Dynamic
+DNS is a service
+offered by many organisations that allow general Internet users to bind
+a Fully Qualified Domain Name to a dynamic IP address, something that
+is normally only achieved with a static IP address.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The concept is simple, you have a fully qualified domain name that you
+want to point to your home computer, the only problem is that your ISP
+account uses dynamic IP addresses and it changes every time your server
+reconnects to the Internet. DDNS allows dynamic IP account users a
+service where their DNS records are updated if their connection (IP Address) details
+change, and then allows the updated information to be propagated
+throughout the rest of the DNS world. With an always on server and a
+reliable
+Internet account, it is technically rare for an IP address to change,
+so many home users are embracing the capability.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Many new broadband modems are capable of supporting DDNS and automatic
+updates using preconfigured software internal to the modem. We will
+provide our own automation script a little further on.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>DDNS
+is only used with globally routed IP addresses which are external of
+your private network. This is not the internal private network
+addresses. Basic
+DNS principles for private networks are covered in <a href="08-Domain_Name_System_BIND.html">chapter
+8</a>.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span>To
+use DDNS you need the
+following:<br>
+
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+  <li>a registered domain name,</li>
+
+
+
+
+
+
+
+
+  <li>a dynamic IP address,<br>
+
+
+
+
+
+
+
+
+  </li>
+
+
+
+
+
+
+
+
+  <li>an account with a DDNS
+service provider, and</li>
+
+
+
+
+
+
+
+
+  <li>a means to update the
+service (next section).</li>
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+
+An Internet domain name was considered as one of our planning
+principles in <a href="02-Planning_Considerations.html">chapter
+2</a>.
+To fully implement our networking services for
+the external network, a domain name is required. InterNIC
+maintains this list (<a href="http://www.internic.net/origin.html">http://www.internic.net/origin.html</a>)
+of Domain Registrars listed by country if you need to register a domain.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Some Dynamic DNS service providers also offer sub domain names that can
+be registered and used for free, the names are similar to
+"yourname.no-ip.org" or "yourname.homelinux.org". If you are happy
+using a simple sub domain instead of registering (and paying for) your
+own domain name, then you should have a look at some of the services offered
+by the Dynamic DNS service providers.<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Some of the DDNS service providers are listed in the following table.
+Most offer free accounts that will allow the registration of a few
+domain names, providing the basic requirements for home users. Some
+providers offer extra services like backup mail server for times that
+your Internet connection may be offline, however these extra services
+may not be free. If in doubt about the services provided, please
+contact the relevant organisation.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold; width: 180px;">Organisation<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="font-weight: bold;">Website<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">ZoneEdit<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.zoneedit.com">http://www.zoneedit.com</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">No-IP.com<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.no-ip.com">http://www.no-ip.com</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">DynDNS.org<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><span style="text-decoration: underline;"><a href="http://www.dyndns.org">http://www.dyndns.org</a></span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">DHS
+International<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.dhs.org">http://www.dhs.org</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">DyNS<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.dyns.cx">http://www.dyns.cx</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">Cn99<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.3322.org">http://www.3322.org</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">DynDNS.DK<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://dyndns.dk">http://dyndns.dk</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">eNom,
+Inc<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.enom.com">http://www.enom.com</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 180px;">TZODNS<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td><a href="http://www.tzo.com">http://www.tzo.com</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+At this point you will need to configure your registered domain name
+using one of the DDNS service provider accounts. Please consult their
+online documentation for assistance in this task.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>You will need to
+register your host (ie. <span style="font-family: monospace;">galaxy.example.com</span>)
+against your present dynamic IP address. You should also now add an
+"alias" (or CNAME) of "www" which points to galaxy.example.com -
+substitute for your specific domain. Be sure to set an MX (mail
+exchange) record for your domain if you plan on setting up a mail server for your network.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+
+<h2><a name="ddnsauto"></a><a href="#top">Dynamic DNS
+Automation</a></h2>
+
+
+
+
+
+
+
+
+The key to effective Dynamic DNS is ensuring that whenever your dynamic
+IP address changes on your broadband account, that the changes are sent
+to your DDNS service promptly so they can be replicated across the
+entire DNS.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+This can be achieved by editing your ppp connection script, and placing
+a wget HTTP request towards the bottom of the script to execute after
+the dialup
+connection has been called. The following update is for a zoneedit.com
+DDNS account.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td> [bash]# <span style="font-weight: bold;">vi
+/etc/ppp/ip-up.local</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>wget -O -
+--http-user=username --http-passwd=password
+--no-check-certificate &nbsp;\<br>
+
+
+
+
+
+
+
+&nbsp; &nbsp; &nbsp;"https://dynamic.zoneedit.com/auth/dynamic.html?host=galaxy.example.com"<br>
+
+
+
+
+
+
+
+
+      <span class="end-tag"></span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+      <td>Always check the <span style="font-family: monospace;">wget</span>
+command in a terminal window first, this allows you to debug it slightly
+and view (or install) any SSL certificates that are associated with
+the website.<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+You should be aware that while the above communication is using the
+HTTPS protocol which provides some level of confidentiality for your
+account details, the executing command line can be viewed by any local
+user
+simply with the <span style="font-family: monospace;">ps</span>
+command. This is an important consideration if normal users are going
+to have access on the server.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The output of the above command looks similar to this.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">wget -O -
+--http-user=username --http-passwd=password --no-check-certificate \<br>
+
+
+
+
+
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"https://dynamic.zoneedit.com/auth/dynamic.html?host=galaxy.example.com"</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  <tr>
+
+
+
+
+
+
+
+      <td>
+--21:28:12--&nbsp;
+https://dynamic.zoneedit.com/auth/dynamic.html?host=galaxy.example.com<br>
+
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+=&gt; `-'<br>
+
+
+
+
+
+
+
+
+Resolving dynamic.zoneedit.com... 69.72.142.98<br>
+
+
+
+
+
+
+
+
+Connecting to dynamic.zoneedit.com[69.72.142.98]:443... connected.<br>
+
+
+
+
+
+
+
+WARNING: Certificate verification error for dynamic.zoneedit.com: self signed certificate<br>
+
+
+
+
+
+
+
+WARNING: certificate common name `localhost.localdomain' doesn't match requested host name `dynamic.zoneedit.com'.<br>
+
+
+
+
+
+
+
+HTTP request sent, awaiting response... 200 OK<br>
+
+
+
+
+
+
+
+
+Length: 109 [text/html]<br>
+
+
+
+
+
+
+
+
+      <br>
+&nbsp;0%
+[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp; ]
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--.--K/s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+
+
+
+
+
+
+
+
+&lt;<span style="font-weight: bold;">SUCCESS CODE="200" TEXT="Update succeeded." ZONE="example.com"
+HOST="galaxy.example.com" IP="xxx.xxx.xxx.xxx"</span>&gt;<br>
+
+
+
+
+
+
+
+
+100%[====================================================================&gt;]
+109&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--.--K/s<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+21:28:17 (1.93 MB/s) - `-' saved [109/109]</td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The above solution ensures that any time the <span style="font-family: monospace;">ppp0</span>
+interface is brought
+up using the correct initialisation scripts, that an update is sent to
+the DDNS service.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+It is possible for many reasons that the <span style="font-family: monospace;">ppp0</span>
+interface can be started and the DDNS update may be unsuccessful. This
+scenario can be addressed by using a script which is called every few
+hours as a precautionary measure.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Create the following script to update the account details for your
+ZoneEdit.com account.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/bin/ddns-update</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td><span class="end-tag"></span>#!/bin/sh<br>
+
+
+
+
+
+
+
+
+#<br>
+
+
+
+
+
+
+
+
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DDNS
+Automation Script -
+ZoneEdit.com<br>
+
+
+
+
+
+
+
+
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File:
+/bin/ddns-update<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+# Set ZoneEdit.com Account Details<br>
+
+
+
+
+
+
+
+
+USER=username<br>
+
+
+
+
+
+
+
+
+PASS=password<br>
+
+
+
+
+
+
+
+
+HOST=galaxy.example.com<br>
+
+
+
+
+
+
+
+
+EMAIL=admin@example.com<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+# Constants - change files if needed<br>
+
+
+
+
+
+
+
+
+TMP1=/tmp/ddns_tmp1<br>
+
+
+
+
+
+
+
+
+TMP2=/tmp/ddns_tmp2<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+# Send update request and save results<br>
+
+
+
+
+
+
+
+
+wget -O $TMP1 --http-user=$USER --http-passwd=$PASS
+--no-check-certificate \ <br>
+
+
+
+
+
+
+
+&nbsp; &nbsp; &nbsp;"https://dynamic.zoneedit.com/auth/dynamic.html?host=$HOST"<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+echo ZoneEdit.com - DDNS Update &gt; $TMP2<br>
+
+
+
+
+
+
+
+
+echo Time: `date '+%T - %e %B'` &gt;&gt; $TMP2<br>
+
+
+
+
+
+
+
+
+cat $TMP1 &gt;&gt; $TMP2<br>
+
+
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+
+
+cat $TMP2 | mail -s "ZoneEdit.com - DDNS Update for $HOST" $EMAIL<br>
+
+
+
+
+
+
+
+
+rm -f $TMP1 $TMP2<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Next you need to make the script executable (Consider if only root or
+all users can read the script, and apply the appropriate permissions).<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chmod +x
+/bin/ddns-update</span> </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+To test the script you should execute it manually at the command prompt
+to see if it is functional. If the script is suitable it can be
+scheduled with cron to execute on a regular basis.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">crontab -e</span><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>00 */8 * * *
+/bin/ddns-update<br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The above crontab entry will execute the ddns-update script every 8
+hours.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+The script is designed to email the update query results to a
+particular user account. If you receive the following '707' error code,
+then the DDNS update script is being scheduled too often and should be
+relaxed.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td>ERROR CODE="707"
+TEXT="Duplicate updates for the same
+host/ip, adjust
+client settings" ZONE="example.com" HOST="galaxy.example.com"&gt; </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+Remember the initial ip-up solution should provide adequate
+stability for your DDNS requirements, and the <span style="font-family: monospace;">ddns-update</span>
+script is only a
+precautionary measure; try not to over use it.<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="04-Network_Configuration.html">Previous</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="06-Firewall_Concepts.html">Next</a><br>
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+</body>
+</html>

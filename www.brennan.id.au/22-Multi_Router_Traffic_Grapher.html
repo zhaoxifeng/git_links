@@ -1,0 +1,1672 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Multi Router Traffic Grapher</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="21-Virtual_Private_Networking.html">Previous</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="23-System_Backup.html">Next</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<hr>
+<h1>Chapter 22 - Multi Router Traffic Grapher</h1>
+
+
+
+
+
+
+<h1 style="text-align: center;"><span style="color: rgb(255, 0, 0); font-weight: bold;">!!! WARNING - THIS CHAPTER IS IN DRAFT - WARNING !!!</span></h1>
+
+
+
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Versions:</span></td>
+
+
+
+
+
+
+
+
+
+      <td>- mrtg 2.13.2<br>
+
+
+
+
+
+
+
+
+
+- webalizer 2.01_10-29</td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<a href="#concepts">Initial Concepts</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#config">Basic
+Configuration</a><br>
+
+
+
+
+
+
+
+
+
+<a href="#addentries"></a><br>
+
+
+
+
+
+
+
+
+
+M<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="concepts"></a><a href="#top">Initial
+Concepts</a></h2>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+      <td style="width: 616px;">
+      <tt>[bash]# <span style="font-weight: bold;">cp /etc/mrtg/mrtg.cfg</span></tt><tt><span style="font-weight: bold;"> /etc/mrtg/mrtg.cfg.original</span></tt></td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+  
+  
+  
+  
+  
+  
+
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+
+
+
+      <td><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<h2><a name="config"></a><a href="#top">Basic
+Configuration</a></h2>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt>[bash]# <span style="font-weight: bold;">vi /etc/mrtg/mrtg.cfg</span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td>
+      
+      
+      
+      
+      <pre>######################################################################<br># Multi Router Traffic Grapher<br>#<br># Host:         galaxy.example.com<br># Descr:        Linux Home Server<br># Dated:        10 June 2006<br># Contact:      Miles Brennan (sysadmin@example.com)<br># Location:     brisbane.qld.au<br>######################################################################<br><br>HtmlDir: /var/www/mrtg<br>ImageDir: /var/www/mrtg<br>LogDir: /var/lib/mrtg<br>ThreshDir: /var/lib/mrtg<br><br>Options[_]:     growright, bits<br>WithPeak[_]:    ymw<br>XSize[_]:       500<br>YSize[_]:       135<br><br>Refresh:        300<br>#Interval:      5<br><br>######################################################################<br><br>Target[ppp0]: 4:myHomeServer@localhost<br>SetEnv[ppp0]: MRTG_INT_IP="<span style="font-weight: bold; text-decoration: underline; color: rgb(255, 0, 0);">???.???.???.???</span>" MRTG_INT_DESCR="ppp0"<br>MaxBytes[ppp0]: 3072000<br>PNGTitle[ppp0]: Traffic Analysis - ppp0 (External ADSL - EXETEL)<br>LegendI[ppp0]: &amp;nbsp;&amp;nbsp;&lt;B&gt;IN:&lt;/B&gt;&amp;nbsp;<br>LegendO[ppp0]: &amp;nbsp;&amp;nbsp;&lt;B&gt;OUT:&lt;/B&gt;&amp;nbsp;<br>BodyTag[ppp0]: &lt;BODY vlink=blue alink=blue&gt;&lt;CENTER&gt;<br>PageFoot[ppp0]: &lt;/CENTER&gt;<br>Title[ppp0]: Traffic Analysis - ppp0 (External ADSL - EXETEL)<br>PageTop[ppp0]: &lt;A href="/mrtg"&gt;&lt;H2&gt;Traffic Analysis - ppp0 (External ADSL2+ Connection)&lt;/H2&gt;&lt;/A&gt;<br> &lt;TABLE WIDTH="450" ALIGN="CENTER"&gt;<br>   &lt;TR&gt;&lt;TD WIDTH="200"&gt;System:&lt;/TD&gt;     &lt;TD&gt;RedHat - Fedora Core 5 (Linux)&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Maintainer:&lt;/TD&gt;             &lt;TD&gt;Miles Brennan&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Description:&lt;/TD&gt;            &lt;TD&gt;Externel ADSL2+ Connection&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Interface Name:&lt;/TD&gt;         &lt;TD&gt;ppp0&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Max Speed:&lt;/TD&gt;              &lt;TD&gt;24576 kBytes/s&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;IP Address:&lt;/TD&gt;             &lt;TD&gt;<span style="font-weight: bold; color: rgb(255, 0, 0); text-decoration: underline;">???.???.???.???</span>&lt;/TD&gt;&lt;/TR&gt;<br> &lt;/TABLE&gt;<br><br>Target[eth1]: 3:myHomeServer@localhost<br>SetEnv[eth1]: MRTG_INT_IP="192.168.1.1" MRTG_INT_DESCR="eth1"<br>MaxBytes[eth1]: 1250000<br>PNGTitle[eth1]: Traffic Analysis - eth1 (Internal LAN - Wired)<br>LegendI[eth1]: &amp;nbsp;&amp;nbsp;&lt;B&gt;IN:&lt;/B&gt;&amp;nbsp;<br>LegendO[eth1]: &amp;nbsp;&amp;nbsp;&lt;B&gt;OUT:&lt;/B&gt;&amp;nbsp;<br>BodyTag[eth1]: &lt;BODY vlink=blue alink=blue&gt;&lt;CENTER&gt;<br>PageFoot[eth1]: &lt;/CENTER&gt;<br>Title[eth1]: Traffic Analysis - eth1 (Internal LAN - Wired)<br>PageTop[eth1]: &lt;A href="/mrtg"&gt;&lt;H2&gt;Traffic Analysis - eth1 (Internal LAN)&lt;/H2&gt;&lt;/A&gt;<br> &lt;TABLE WIDTH="450" ALIGN="CENTER"&gt;<br>   &lt;TR&gt;&lt;TD WIDTH="200"&gt;System:&lt;/TD&gt;     &lt;TD&gt;RedHat - Fedora Core 5 (Linux)&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Maintainer:&lt;/TD&gt;             &lt;TD&gt;Miles Brennan&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Description:&lt;/TD&gt;            &lt;TD&gt;Internal Network Device 1&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Interface Name:&lt;/TD&gt;         &lt;TD&gt;eth1&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;Max Speed:&lt;/TD&gt;              &lt;TD&gt;10/100 MBs (auto)&lt;/TD&gt;&lt;/TR&gt;<br>   &lt;TR&gt;&lt;TD&gt;IP Subnet:&lt;/TD&gt;              &lt;TD&gt;192.168.1.1/24&lt;/TD&gt;&lt;/TR&gt;<br> &lt;/TABLE&gt;<br></pre>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt>[bash]# <span style="font-weight: bold;">vi /var/www/mrtg/index.html</span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td>
+      
+      
+      
+      
+      <pre>&lt;HTML&gt;<br>&lt;HEAD&gt;<br>    &lt;TITLE&gt;Network Traffic Analysis - www.example.com&lt;/TITLE&gt;<br>    &lt;META HTTP-EQUIV="Refresh" CONTENT="300"&gt;<br>&lt;/HEAD&gt;<br>&lt;BODY vlink=blue alink=blue&gt;<br>&lt;CENTER&gt;<br><br>&lt;H2&gt;MRTG - Network Traffic Analysis&lt;BR&gt;<br>(Host: &lt;A href="http://galaxy.example.com/"&gt;galaxy.example.com&lt;/A&gt;)&lt;/H2&gt;<br><br>&lt;H4&gt;System Type: &lt;A href="http://fedora.redhat.com/"&gt;RedHat Fedora Core 5&lt;/A&gt;&lt;/H4&gt;<br><br>&lt;TABLE BORDER=0 CELLPADDING=0 CELLSPACING=20&gt;<br>&lt;tr&gt;<br>  &lt;td align=center&gt;<br>    &lt;B&gt;Traffic Analysis - ppp0&lt;BR&gt;(External ADSL2+ Connection)&lt;/B&gt;&lt;P&gt;<br>    &lt;A HREF="ppp0.html"&gt;&lt;IMG SRC="ppp0-day.png" ALT="Click for PPP0 Statistics..." BORDER=0&gt;&lt;/A&gt;&lt;BR&gt;<br>  &lt;/td&gt;<br>&lt;/tr&gt;<br>&lt;tr&gt;<br>  &lt;td align=center&gt;<br>    &lt;B&gt;Traffic Analysis - eth1&lt;BR&gt;(Internal LAN)&lt;/B&gt;&lt;P&gt;<br>    &lt;A HREF="eth1.html"&gt;&lt;IMG SRC="eth1-day.png" ALT="Click for ETH1 Statistics..." BORDER=0&gt;&lt;/A&gt;&lt;BR&gt;<br>  &lt;/td&gt;<br>&lt;/tr&gt;<br>&lt;/TABLE&gt;<br><br>&lt;/CENTER&gt;<br>&lt;/BODY&gt;<br>&lt;/HTML&gt;<br></pre>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr style="font-family: monospace;">
+
+
+
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.original</span><br>
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi /etc/snmp/snmpd.conf</span> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr style="font-family: monospace;">
+
+
+
+
+      <td># &nbsp;Configure basic Read-Only community string.<br>
+
+
+rocommunity &nbsp;myHomeServer<br>
+
+
+      <br>
+
+
+# &nbsp;Mapping from Community to Security.<br>
+
+
+
+
+com2sec &nbsp; &nbsp;&nbsp; myLoopNet &nbsp; localhost &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+myHomeServer<br>
+
+
+
+
+com2sec &nbsp; &nbsp; &nbsp;myExtNet        &nbsp; &nbsp;<span style="font-weight: bold; color: rgb(255, 0, 0);">???.???.???.???</span>/255.255.255.255 &nbsp; myHomeServer &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="font-weight: bold; color: rgb(255, 0, 0);">&lt;-- Place external IP Address in here.</span><br>
+
+
+
+
+com2sec &nbsp; &nbsp; &nbsp;myIntNet &nbsp;
+&nbsp;192.168.1.0/255.255.255.0 &nbsp; &nbsp; &nbsp; &nbsp; myHomeServer<br>
+
+
+      <br>
+
+
+# &nbsp;Mapping from Security Group to Security Name.<br>
+
+
+
+
+group          &nbsp; &nbsp; &nbsp; &nbsp;myROGroup       &nbsp; v1                                 myLoopNet<br>
+
+
+
+
+group          &nbsp; &nbsp; &nbsp; &nbsp;myROGroup       &nbsp; v1                                 myExtNet<br>
+
+
+
+
+group          &nbsp; &nbsp; &nbsp; &nbsp;myROGroup       &nbsp; v1                                 myIntNet<br>
+
+
+      <br>
+
+
+# &nbsp;Define the view.<br>
+
+
+
+
+view           &nbsp; &nbsp; &nbsp; &nbsp; all-mibs        &nbsp; &nbsp;included                           .1      80<br>
+
+
+      <br>
+
+
+# &nbsp;Grant Access From the Security Model to MIB View.<br>
+
+
+
+
+access         &nbsp; &nbsp; &nbsp; myROGroup       &nbsp; v1      noauth  0       all-mibs        none    none<br>
+
+
+
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  <tr>
+
+
+      <td></td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt>[bash]# </tt><span style="font-weight: bold;">chkconfig
+--level 2345 snmpd on</span><br>
+
+
+
+
+      <tt><span style="font-weight: bold;"></span></tt><tt>[bash]# </tt><span style="font-weight: bold;">chkconfig
+--list snmpd</span><tt><span style="font-weight: bold;"><br>
+
+
+
+
+      </span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt></tt><tt></tt><tt>[bash]# <span style="font-weight: bold;">/etc/init.d/snmpd restart</span></tt><tt><span style="font-weight: bold;"><br>
+
+
+
+
+      </span></tt><tt>[bash]# <span style="font-weight: bold;">grep snmp /var/log/messages</span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr class="">
+
+
+
+
+
+
+
+
+
+      <td>[bash]#&nbsp;<span style="font-weight: bold;">snmpwalk -v 1 -c myHomeServer localhost interface | grep Descr</span> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td>IF-MIB::ifDescr.1 = STRING: lo<br>
+
+
+
+
+IF-MIB::ifDescr.2 = STRING: eth0<br>
+
+
+
+
+IF-MIB::ifDescr.3 = STRING: eth1<br>
+
+
+
+
+IF-MIB::ifDescr.4 = STRING: ppp0</td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt>[bash]#&nbsp;</tt><tt><span style="font-weight: bold;">vi /etc/mrtg/mrtg.cfg</span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td>
+      
+      Target[ppp0]: <span style="font-weight: bold; color: rgb(255, 0, 0); text-decoration: underline;">4</span>:myHomeServer@localhost<br>
+
+
+Target[eth1]: <span style="font-family: monospace; color: rgb(255, 0, 0); text-decoration: underline; font-weight: bold;">3</span>:myHomeServer@localhost
+
+      </td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td><tt>[bash]# <span style="font-weight: bold;">rm -f /var/lib/mrtg/*</span></tt> </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <tr>
+
+
+
+
+      <td></td>
+
+
+
+
+    </tr>
+
+
+
+
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="21-Virtual_Private_Networking.html">Previous</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a> </td>
+
+
+
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="23-System_Backup.html">Next</a><br>
+
+
+
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

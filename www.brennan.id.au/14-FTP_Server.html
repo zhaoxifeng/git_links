@@ -1,0 +1,3925 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - FTP Server</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+<div style="text-align: center;">
+<span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span>
+</div>
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="13-Apache_Web_Server.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="15-System_Printing.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<hr>
+<h1>Chapter 14 - FTP Server<br>
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td style="width: 140px;"><span style="font-weight: bold;">Version:</span></td>
+
+
+
+
+
+      <td>- vsftpd 2.0.4</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+<a href="#config">Initial
+Configuration</a><br>
+
+
+
+
+
+
+<a href="#starting">Starting
+The Server</a><br>
+
+
+
+
+
+
+<a href="#control">Controlling
+User Access</a><br>
+
+
+
+
+
+
+<a href="14-FTP_Server.html#secure">Enabling
+TLS/SSL Encryption</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+File Transfer Protocol (<a href="http://www.ietf.org/rfc/rfc959.txt">RFC959</a>)
+has been around for many years as one of the older more reliable
+methods
+for transferring data files and is still being used extensively by many
+organisations today. The <a href="http://vsftpd.beasts.org">Very
+Secure FTP Daemon</a>
+(vsftpd) is one of the more popular and robust FTP servers available
+for the Linux community. The vsftpd server has had one major design
+rule from its initial development, enforcing high security
+requirements. The
+server can operate in a chroot jail and now supports TLS/SSL encryption
+(from Version 2).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The initially installed configuration provides full download access for
+anonymous users. This chapter will cover some of the basic
+configuration parameters for the server and identify some settings to
+improve security for authorised access only. It will also look at
+enabling TLS/SSL encryption to provide a level of safety for your
+transfer requirements. FTP Security Extensions are discussed in <a href="http://www.ietf.org/rfc/rfc2228.txt">RFC2228</a>.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="config"></a><a href="#top">Initial
+Configuration</a></h2>
+
+
+
+
+
+
+The original configuration file for vsftpd is perfectly suited to a
+secure anonymous FTP server and makes a good basis to start
+customising, It should be backed up to ensure any errors can be
+restored quickly from a known good file.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cp
+/etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.original</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">vi
+/etc/vsftpd/vsftpd.conf</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To display a welcome banner to every new user that connects, set the <span style="font-family: monospace;">banner_file</span>
+parameter and place a suitable welcome message inside the designated
+file.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>banner_file=/etc/vsftpd/welcome.banner </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Using the <span style="font-family: monospace;">ftpd_banner</span>
+parameter allows you to quickly set a single line welcome string for
+when new users connect.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>ftpd_banner=Welcome to
+my vsFTPd Server.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>If the <span style="font-family: monospace;">banner_file</span>
+and <span style="font-family: monospace;">ftpd_banner</span>
+are both enabled, then the <span style="font-family: monospace;">banner_file</span>
+is displayed before the <span style="font-family: monospace;">ftpd_banner</span>.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If you are doing any FTP mirroring and you host files from several
+different organisations, you can set an individual message that will be
+displayed when the user lists the contents of each different directory.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>dirmessage_enable=YES<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The default message file for each directory is "<span style="font-family: monospace;">.message</span>",
+adjust this
+setting if you wish to use a different filename.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>message_file=.message<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If a banner file and directory message are enabled in the FTP server's
+document root (/var/ftp), then the banner will be displayed immediately
+followed by the directory message.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The vsftpd server can run in standalone mode or be supported by
+inetd/xinetd.
+To enable standalone mode set "<span style="font-family: monospace;">listen=YES</span>"
+(default).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>listen=YES<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To disable inetd/xinetd server, set "<span style="font-family: monospace;">tcp_wrappers=NO</span>"
+(default).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>tcp_wrappers=NO<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">umask</span>
+parameters
+define the "chmod" value (permissions) of the files when they are
+uploaded to the FTPs filesystem. To calculate the permission value,
+start at 777, then substract the <span style="font-family: monospace;">umask</span>
+value. So if a <span style="font-family: monospace;">anon_umask</span>
+value is set at 077, then the file will have the permissions of 700 on
+the file system (this may prevent the file from later being downloaded
+depending on filesystem permissions).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>anon_umask=077<br>
+
+
+
+
+
+
+local_umask=022<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The default account for anonymous access, if
+another system account is needed it can be specified here.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>nopriv_user=ftp<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+This directive puts the FTP server into active mode for the data
+connection, the default is passive mode ("<span style="font-family: monospace;">YES</span>").<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>pasv_enable=YES<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Adjust these to enable transfer logging.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>xferlog_enable=YES<br>
+
+
+
+
+
+
+xferlog_file=/var/log/xferlog<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Specify the name that the Pluggable Authentication Module is to use.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>pam_service_name=vsftpd<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+This is the 'root' directory where your FTP files should be located. It
+should be an empty directory, and not writeable by "ftp" user (unless
+you are configuring anonymous upload).<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>anon_root=/var/ftp<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+For further configuration details, type "<span style="font-family: monospace;">man
+vsftpd.conf</span>" at the command
+prompt.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="starting"></a><a href="#top">Starting
+The Server</a></h2>
+
+
+
+
+
+
+Now that the FTP server has been configured, the runlevels should be
+set and checked to ensure the server will start as required.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chkconfig
+--level 345 vsftpd on</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">chkconfig --list vsftpd</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The vsftpd daemon can now be started. Besure the check the system log
+for any initialisation errors.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/vsftpd
+restart</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">grep vsftpd
+/var/log/messages</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="control"></a><a href="#top">Controlling
+User Access</a><br>
+
+
+
+
+
+
+</h2>
+
+
+
+
+
+
+In vsftpd's initial state anonymous users are are allowed full download
+access
+to all the resources available through the FTP server, and adjustments
+to the configuration are required to enforce a more secure environment.<br>
+
+
+
+
+
+
+<h3>Anonymous Users</h3>
+
+
+
+
+
+
+The default setting for allowing anonymous users is YES. To disable
+anonymous access it is not enough to comment out the following
+parameter, it MUST be changed to NO, otherwise anonymous still has
+access.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>anonymous_enable=YES<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>anonymous_enable=NO </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If the FTP server is going to be accessible to the general public, then
+the anonymous account can be granted the rights to upload files to the
+server and create new directories inside the FTP root directory. Give
+serious consideration to these abilities before implementing them.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>#anon_upload_enable=YES<br>
+
+
+
+
+
+
+#anon_mkdir_write_enable=YES<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Warning !!" src="images/warning.gif"></td>
+
+
+
+
+
+
+      <td>Always
+avoid where possible, allowing anonymous users the ability to upload
+files to the FTP server. This has the potential to allow users of
+pirate software to abuse your system for further distribution. Always
+check the files on a regular basis for any sign of abuse.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To restrict the upload rate of connected anonymous users, set the
+<span style="font-family: monospace;">anon_max_rate</span>
+to an appropriate value for your connection. The rate at
+which system account users can upload can also be restricted using the
+<span style="font-family: monospace;">local_max_rate</span>
+parameter. Rates are in bytes per second, "0" is
+disabled.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>anon_max_rate=10485760<br>
+
+
+
+
+
+
+local_max_rate=0<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+You may for some reason decide to limit the amount of users that
+connect to your server at anytime, and how many simultaneous
+connections can be
+maintained from each IP address.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>max_clients=500<br>
+
+
+
+
+
+
+max_per_ip=4<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>System Accounts</h3>
+
+
+
+
+
+
+Normally any user that has an account on the local system can log in
+using their account details and access their files. As a security
+measure, not all system accounts should be allowed to do this. Any
+user account that is listed in the <span style="font-family: monospace;">/etc/vsftpd.ftpuser</span>
+file will not be granted log in access through the server daemon. This
+file is normally used for system accounts (root, bin etc..) and bad
+people.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>Do not put anonymous in <span style="font-family: monospace;">/etc/vsftpd.ftpuser</span>
+file, it does nothing. Anonymous access must be
+disabled with "<span style="font-family: monospace;">anonymous_enable=NO</span>"
+parameter. </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To create a selective list for system user accounts that can access the
+FTP server.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>userlist_enable=YES<br>
+
+
+
+
+
+
+userlist_file=/etc/vsftpd/user_list </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If you need to stop all system user accounts from being able to log in
+to the FTP,
+then disable the following.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>local_enable=YES<br>
+
+
+
+
+
+
+write_enable=YES </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+System user accounts normally have the ability to browse the complete
+filesystem
+as though they were logged onto the terminal (depending on directory
+permissions). To block all users from this
+activity, they can be <span style="font-family: monospace;">chroot</span>
+jailed into their home directories. This means they will be locked
+inside their own home directories and can't view or access the rest of
+the filesystem.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>chroot_local_user=YES </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>Using <span style="font-family: monospace;">chroot_local_user</span>
+is handy for allowing users to access their "public_html" directories
+on a publicly shared web server.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Users can also be selectively jailed to their home directories.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);">chroot_list_enable=YES<br>
+
+
+
+
+
+
+chroot_list_file=/etc/vsftpd/chroot_list</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>If "<span style="font-family: monospace;">chroot_list_enable=YES</span>",
+then the <span style="font-family: monospace;">/etc/vsftpd.chroot_list</span>
+file contains a selective list of users that are jailed to
+their home directories. If "<span style="font-family: monospace;">chroot_local_user=YES</span>"
+is also set, then the entries in the <span style="font-family: monospace;">/etc/vsftpd.chroot_list</span>
+are
+users that are not jailed; the opposite effect. </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="secure"></a><a href="#top">Enabling
+TLS/SSL Encryption</a></h2>
+
+
+
+
+
+
+The release of vsftpd version 2 brought some major updates to the FTP
+package and the most notable is the inclusion of TLS/SSL encryption for
+securing authentication and data transfers between clients and server.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>You
+should only enable TLS/SSL if you really need it. If you only intend to
+cater for anonymous users on your server, then you should not implement
+encryption.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+To enable the TLS/SSL security controls, the vsftpd version must have
+been compiled with its support. To find out if your version has been
+compiled with SSL support, execute the following command at the prompt.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">ldd
+/usr/sbin/vsftpd | grep ssl</span> </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If the command displays the libssl line in its output, then your
+version is ready to support TLS/SSL. If libssl is not in the output
+then your version of vsftpd does not support encryption, you will
+either have to recompile the source code yourself, or convince your
+distribution developers to consider it for inclusion.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libssl.so.6 =&gt; /lib/libssl.so.6 (0x001bf000)<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Before the server is able to do any encryption, it requires the
+generation of a private key and a digital certificate. During the key
+generation process you will be asked several questions in regards of
+server name, organisational name, country code.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);"><span style="font-weight: bold; color: rgb(255, 0, 0);">PREFERRED
+METHOD..</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">cd&nbsp;/etc/pki/tls/certs</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">make vsftpd.pem</span><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="background-color: rgb(220, 220, 220);"><span style="font-weight: bold; color: rgb(255, 0, 0);">ALTERNATE
+METHOD..</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">openssl req
+-x509 -nodes -days 730 -newkey rsa:1024 \</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-keyout&nbsp;/etc/pki/tls/certs/vsftpd.pem \</span><br style="font-weight: bold;">
+
+
+      <span style="font-weight: bold;">
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-out&nbsp;/etc/pki/tls/certs/vsftpd.pem</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Both commands above are suitable for creating your certificates. The
+bottom command creates an X509 SSL certificate with a life of 2
+years (-days 730).<br>
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <tr>
+
+
+
+
+
+
+
+
+
+
+      <td>Country Name (2 letter code) [GB]:<span style="color: rgb(255, 0, 0); font-weight: bold;">AU</span><br>
+
+
+
+
+
+
+
+
+
+
+State or Province Name (full name) [Berkshire]:<span style="color: rgb(255, 0, 0); font-weight: bold;">QLD</span><br>
+
+
+
+
+
+
+
+
+
+
+Locality Name (eg, city) [Newbury]:<span style="color: rgb(255, 0, 0); font-weight: bold;">Brisbane</span><br>
+
+
+
+
+
+
+
+
+
+
+Organization Name (eg, company) [My Company Ltd]:<span style="font-weight: bold; color: rgb(255, 0, 0);">Miles Brennan</span><span style="font-weight: bold; color: rgb(255, 0, 0);"></span><br>
+
+
+
+
+
+
+
+
+
+
+Organizational Unit Name (eg, section) []:<span style="font-weight: bold; color: rgb(255, 0, 0);"></span><span style="font-weight: bold; color: rgb(255, 0, 0);">Home Linux Server</span><span style="font-weight: bold; color: rgb(255, 0, 0);"></span><br>
+
+
+
+
+
+
+
+
+
+
+Common Name (eg, your name or your server's hostname) []:<span style="font-weight: bold; color: rgb(255, 0, 0);">galaxy.example.com</span><br>
+
+
+
+
+
+
+
+
+
+
+Email Address []:<span style="font-weight: bold; color: rgb(255, 0, 0);">sysadmin@example.com</span></td>
+
+
+
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>If you are using the
+server for legitimate business use and
+you want to provide a level of security assurance to your customers,
+then you
+should use a key that has been signed by a Certificate Authority. </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The contents of the&nbsp;<span style="font-family: monospace;">/etc/pki/tls/certs/vsftpd.pem</span>
+file should be checked to ensure is has a private key and digital
+certificate. If any of the identifying details in the X509 change or
+have been entered incorrectly, you can easily regenerate new keys
+until the details are correct.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-family: monospace;">vsftpd.pem</span>
+file
+should also be secured so only root has access to the file. This does
+not affect the server if it is running as a non privileged account, as
+the keys are loaded before dropping into non privileged mode.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">cat&nbsp;/etc/pki/tls/certs/vsftpd.pem</span><br>
+
+
+
+
+
+
+[bash]# <span style="font-weight: bold;">openssl x509 -in&nbsp;/etc/pki/tls/certs/vsftpd.pem -noout -text</span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">chmod 600&nbsp;/etc/pki/tls/certs/vsftpd.pem</span>
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The configuration file now needs to be adjusted to include the support
+for TSL/SSL encryption. The following details are the recommended
+parameters required, details of each parameter can be obtained from the
+"<span style="font-family: monospace;">man
+vsftpd.conf</span>" file.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">vi
+/etc/vsftpd/vsftpd.conf </span></td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>ssl_enable=YES<br>
+
+
+
+
+
+
+allow_anon_ssl=NO<br>
+
+
+
+
+
+
+force_local_data_ssl=NO<br>
+
+
+
+
+
+
+force_local_logins_ssl=YES<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+ssl_tlsv1=YES<br>
+
+
+
+
+
+
+ssl_sslv2=NO<br>
+
+
+
+
+
+
+ssl_sslv3=NO<br>
+
+
+
+
+
+
+      <br>
+
+
+
+
+
+
+rsa_cert_file=/etc/pki/tls/certs/vsftpd.pem</td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The service should now be restarted for the changes to take effect.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; background-color: rgb(220, 220, 220); text-align: left; font-family: monospace;" border="1" cellpadding="5" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td>[bash]# <span style="font-weight: bold;">/etc/init.d/vsftpd
+restart</span> </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Caution !!" src="images/caution.gif"></td>
+
+
+
+
+
+
+      <td>For TLS/SSL encryption
+to be fully implemented, the FTP
+client application also needs to support secure connections.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h3>TLS/SSL Enabled FTP Clients</h3>
+
+
+
+
+
+
+The <span style="font-weight: bold;">Linux</span>
+based <a href="http://www.gftp.org">gFTP</a>
+client is enabled for TLS/SSL
+connections, however it initially rejects self-signed server
+certificates. This can be fixed by disabling the "Verify SSL Peer"
+setting in options. When making connections, be sure to select the FTPS
+protocol.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The <span style="font-weight: bold;">Windows</span>
+based <a href="http://www.smartftp.com">SmartFTP</a>
+client is also enabled for
+TLS/SSL connections. The FTP server firstly needs to be configured as a
+"Favourite Site", then the properties need to adjusted to use the "FTP
+over SSL Explicit" protocol. Save the changes and connect.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="13-Apache_Web_Server.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="15-System_Printing.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+</body>
+</html>

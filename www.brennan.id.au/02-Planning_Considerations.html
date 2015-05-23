@@ -1,0 +1,1064 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Linux Home Server HOWTO - Planning Considerations</title>
+  <meta content="Miles Brennan" name="author">
+</head>
+
+
+<body>
+
+
+
+
+
+
+<div style="text-align: center;"><span style="font-weight: bold;"><a name="top"></a>Linux
+Home Server HOWTO</span><br>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="01-Introduction.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="03-Installing_Linux.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<hr>
+<h1>Chapter 2 - Planning
+Considerations<br>
+
+
+
+
+
+
+</h1>
+
+
+
+
+
+
+<a href="#aup">Your
+ISP's Acceptable Use Policy</a><br>
+
+
+
+
+
+
+<a href="#requirements">Server
+Requirements</a><br>
+
+
+
+
+
+
+<a href="#domainname">Internet
+Domain Name</a><br>
+
+
+
+
+
+
+<a href="#topology">Network
+Topology</a><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Every network system needs some level of planning. If you have decided
+that
+you are going to install and configure Linux as your main network
+server, then you have planned that, simple as it may be its still a
+plan. The following information is designed to provide some basic
+everyday considerations to expand your new network plan.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="aup"></a><a href="#top">Your ISP's
+Acceptable Use
+Policy</a></h2>
+
+
+
+
+
+
+Before we install our server and connect our new network onto the
+Internet, we must make sure that we are actually allowed to do so.
+Believe it or not, but the Internet Service Provider's plan you used to join the Internet may
+prevent you from connecting your new system and operating with a server
+and extra workstations - the whole intention of this HOWTO.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+How is this so? When you joined your ISP, you would have agreed to use
+their systems the way that they planned their networks and user
+accounts to be utilised.
+All ISPs draft some type of Acceptable Use Policies (AUP) which are
+legal
+binding contracts between the user and ISP, it lays out what you can
+and
+can't do with your account.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Some ISPs do not allow more than one workstation at a time to connect
+with a particular plan. Some may block specific TCP and UDP ports in an
+attempt to protect their own networking infrastructure and customers,
+more so against
+hackers and spammers. Some may also do regular scans of their user's
+traffic to determine who is in breach of their AUP.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Always check with your ISPs AUP to be certain that implementing some
+type of server based system and extra workstations is allowable,
+otherwise you may
+find you no longer have an account if you do the wrong thing. Always
+check with the ISP if you're ever in doubt, ignorance is not an excuse.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+If implementing this HOWTO is going to breach your ISPs AUP, please do
+not proceed with installing the services herein. Alternatively, your
+ISP may have another plan which will be more suited to your needs.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="requirements"></a><a href="#top">Server
+Requirements</a></h2>
+
+
+
+
+
+
+Now that we are sure we can install servers using our Internet account,
+we need to plan how we are going to connect and configure our server.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+A server would typically be described as a networked computer providing
+dedicated services and resources to multiple users and clients. That
+being said, the key concept to remember is dedicated services. Because
+the server is going to provide various full time networked functions,
+it really needs to be a dedicated computer running a single Operating
+System. This allows its services to be available to authorised users
+any
+time they are required.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Each distribution of Linux has an accompanying set of release notes
+which states the computing requirements recommended for an installed
+system to successfully operate its software. Installation sizes can
+range from 800 MB through to around 4 GB just for the operating
+system alone, which does not consider any file storage needs for your
+users or the size of which applications can grow through normal use
+like a networked database application. If you are planning a large
+network for many users, you should consider the storage requirements so
+your users and applications have sufficient hard drive space.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Before you install your server and insert it into your network as the
+centre of all your systems, consider what applications and services it
+will be running at that time, the amount of users connecting, and the
+expected workload it would be subjected to. If you have a large scale
+network then your systems may be better distributed over several
+servers to reduce processor demand on a single computer. It is far more
+sensible (and
+easier) to use a system that will meet your requirements for the future
+than to do a system swap in a few months time.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+This section is not an enticement that you need to purchase the latest
+and biggest components on which to base your server, its just to get
+you thinking about sustaining your system's capabilities for the future.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Most small home users can easily get away with the minimum
+specifications or even less, and a second hand computer will most
+definitely suit their needs.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="domainname"></a><a href="#top">Internet
+Domain Name</a></h2>
+
+
+
+
+
+
+To be uniquely distinguished on the Internet we need one important
+aspect, an Internet Address. Our Internet (or IP) Address is likened to
+an electronic mailing address that computers and network devices use to
+find other networked devices on the electronic super highway, this
+allows the delivery of our
+data.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+That's all well and good for electrical devices, however it is too
+difficult for people to remember many Internet sites purely by a
+numerical address, so to be uniquely identified and easily located, we
+need a Domain Name which best suits the services we offer. A Domain
+Name can be linked to our unique Internet address using the Domain Name
+System which we will be configuring later in <a href="08-Domain_Name_System_BIND.html">Chapter
+8</a><span style="font-weight: bold;">.</span><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The DNS system is historically best suited to static IP addresses.
+However, with the introduction of Dynamic DNS, its now even easier for
+home users to use a Domain Name with a dynamically changing IP
+address. This HOWTO provides a section <span style="font-weight: bold;"></span>
+on <a href="05-Broadband_Connectivity.html#ddnsservices">DDNS
+services</a>
+and the ability to automate any DDNS changes on a dynamic IP account.<br>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+This HOWTO is written with the assumption that you have a registered
+Domain Name that will be used to configure your new server. If you need
+to register a new domain, then InterNIC maintains this list (<a href="http://www.internic.net/origin.html">http://www.internic.net/origin.html</a>)
+of Domain Registrars listed by country. It is recommended that you have
+a domain name registered before installation, as it is easier to
+configure during the installation rather than post fixing.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+Some Dynamic DNS service providers also offer sub domain names that can
+be registered and used for free, the names are similar to
+"yourname.no-ip.org" or "yourname.homelinux.org". If you are happy
+using a simple sub domain instead of registering (and paying for) your
+own domain name, then&nbsp;have a look at some of the services offered
+by the Dynamic DNS service providers listed in <a href="05-Broadband_Connectivity.html#ddnsservices">Chapter 5</a>.<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+We will be using the domain&nbsp;<span style="font-family: monospace;">"<span style="font-weight: bold;">example.com</span>"</span>
+which is free to be used for documentation and training purposes. You
+will need to
+substitute that domain for your registered domain where ever you see it
+throughout this document.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 25px; height: 24px;" alt="Hint !!" src="images/hint.gif"></td>
+
+
+
+
+
+
+      <td>Always have a look at
+several domain registrars before
+registering your domain, some offer extra services that you may not
+need for a simple network, and you can save a little money by finding
+the right one.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="vertical-align: middle; text-align: center; width: 52px;"><img style="width: 24px; height: 24px;" alt="Note !!" src="images/note.gif"></td>
+
+
+
+
+
+
+      <td>Normally you do not own
+a Domain Name. You will be required
+to register it for a period of time at which point it must be
+re-registered so you can continue using that name. Failure to
+re-register a Domain Name when it expires may allow another
+organisation or individual to legally register and use your domain.<br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<h2><a name="topology"></a><a href="#top">Network
+Topology</a></h2>
+
+
+
+
+
+
+Networks are interconnected in many different ways depending on the
+connection types, devices in use, the speed of a link, or even the
+leasing costs of the line. Many organisations have large scale networks
+which require much planning and consideration before they are
+installed, however the majority of home users will connect to the
+Internet using a simple broadband type modem. The Ethernet and USB
+modems would be most typical for home users because of their relatively
+low cost and ease of use; therefore we will concentrate on their
+configuration.<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+The two figures below show what the logical topology of how our network
+will look like, with the server separating and providing security to
+our internal private network, while maintaining an external connection
+to our ISP. This is by no means the best design for a network as it
+relies on a single system to provide our total security; the server.
+Many modems these days come complete with their own pre-installed
+firewall and NAT solutions, these are invaluable devices and provide
+that extra level of security for your home network. Configuring
+security
+enabled routers is outside the scope
+of this HOWTO as these instructions are detailed in the modems user
+manual.<br>
+
+
+
+
+
+
+<br style="font-family: monospace;">
+
+
+
+
+
+
+<br style="font-family: monospace;">
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;"></span><span style="font-family: monospace;">/----------------\        &nbsp; &nbsp; &nbsp; &nbsp;/------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;">
+| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp;
+&nbsp; &nbsp;&nbsp; | &nbsp;&nbsp; &nbsp;USB Modem&nbsp;&nbsp; &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;">     | ISP / Internet |--------|      &nbsp; &nbsp;&nbsp; (ppp0)      &nbsp;&nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;">
+| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; | &nbsp;
+&nbsp; &nbsp;&nbsp; \------------------/</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;">     \----------------/                &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">|  USB Link</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">/------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                               | &nbsp;    &nbsp;Home Server &nbsp;   |&nbsp;  /-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                               |      &nbsp; &nbsp; &nbsp;(eth0)      &nbsp; &nbsp;&nbsp; |--| Network Printer |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                               \------------------/&nbsp;  \-----------------/</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                                        |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                                        |   Internal Private Network</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                                        |   Subnet: 192.168.1.0/24</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">                                        |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /-----------------\ &nbsp;&nbsp;
+/--------------\ &nbsp; &nbsp;/-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;Workstation 1&nbsp; |----|
+Hub / Switch |----|&nbsp; Workstation N &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; \-----------------/ &nbsp;
+&nbsp;\--------------/ &nbsp;&nbsp; \-----------------/</span><br>
+
+
+
+
+
+
+<span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;</span><span style="font-weight: bold;">Figure 1 - USB
+Modem Layout</span>&nbsp;
+<br>
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+The topology in figure 1 uses a single ethernet device (eth0) for
+connecting all
+the internal systems to the server, and a single USB modem (ppp0) to dial the
+server and pass all its data. Before choosing this setup method you
+should ensure your USB modem is supported by Linux or that your modem
+has drivers available for you to use.<br>
+
+
+
+
+
+
+<br style="font-family: monospace;">
+
+
+
+
+
+
+<br style="font-family: monospace;">
+
+
+
+
+
+
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span><span style="font-family: monospace;"></span><span style="font-family: monospace;">/----------------\        &nbsp; &nbsp; &nbsp; &nbsp;/------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp; | &nbsp; &nbsp; &nbsp;&nbsp; |&nbsp; Ethernet Modem &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ISP / Internet |--------|(Router/Firewall?)|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;| &nbsp; &nbsp; &nbsp;&nbsp; \------------------/</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;\----------------/ &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span style="font-family: monospace;">|   Ethernet Link</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /------------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;&nbsp; (eth0/ppp0) &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;&nbsp; Home Server &nbsp;
+|&nbsp; /-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;(eth1)
+&nbsp;&nbsp; &nbsp; |--| Network Printer |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; \------------------/
+&nbsp;\-----------------/</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+Internal Private Network</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+Subnet: 192.168.1.0/24</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /-----------------\ &nbsp;&nbsp;
+/--------------\ &nbsp; &nbsp;/-----------------\</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&nbsp; Workstation 1&nbsp; |----|
+Hub / Switch |----|&nbsp; Workstation N &nbsp;|</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; \-----------------/ &nbsp;
+&nbsp;\--------------/ &nbsp;&nbsp; \-----------------/</span><br style="font-family: monospace;">
+
+
+
+
+
+
+<span style="font-weight: bold;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;</span><span style="font-weight: bold;">Figure 2 - Ethernet Modem Layout</span><br>
+<span style="font-weight: bold;">
+
+
+
+
+
+</span><br>
+
+
+
+
+
+
+Similar to figure 1, the topology illustrated in figure 2 shows the
+same internal network design with a single ethernet device (eth1).
+However there is a second ethernet device (eth0) which allows the
+Point-to-Point Protocol connection out through the ethernet modem and
+onto your ISP. This is the preferred method for connection as the
+connection is less problematic using an ethernet modem, however it does
+require two network cards.<br>
+
+
+
+
+
+
+<br>
+
+
+The configurations and application settings used throughout this HOWTO
+follow the Ethernet Modem network topology as seen in Figure 2.<br>
+
+
+<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+<hr>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: left;"><a href="01-Introduction.html">Previous</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+      <td style="width: 40%; text-align: center;"><a href="index.html">Home</a>
+      </td>
+
+
+
+
+
+
+      <td style="width: 30%; text-align: right;"><a href="03-Installing_Linux.html">Next</a><br>
+
+
+
+
+
+
+      </td>
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+</body>
+</html>
