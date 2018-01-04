@@ -18,3 +18,6 @@ http://www.tokiwinter.com/bind-10-first-steps/
 http://yuanbin.blog.51cto.com/363003/110825
 
 https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Closures.html#//apple_ref/doc/uid/TP40014097-CH11-ID94
+http://happenroc.github.io/blog/2016/01/23/get-image-from-phasset/
+http://nshipster.com/phimagemanager/
+
