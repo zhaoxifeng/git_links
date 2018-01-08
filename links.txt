@@ -22,4 +22,7 @@ http://happenroc.github.io/blog/2016/01/23/get-image-from-phasset/
 http://nshipster.com/phimagemanager/
 https://stackoverflow.com/questions/24581517/read-a-file-url-line-by-line-in-swift
 https://developer.apple.com/documentation/foundation/file_system?language=objc
+https://github.com/swiftsocket/SwiftSocket
+https://github.com/vapor/sockets
+https://github.com/IBM-Swift/BlueSocket
 
