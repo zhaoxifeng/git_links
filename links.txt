@@ -29,3 +29,4 @@ https://github.com/IBM-Swift/BlueSocket
 node js
 http://www.hylianux.com/downloads/nodebeginner.pdf
 https://nodeaddons.com/c-processing-from-node-js/
+http://pepa.holla.cz/wp-content/uploads/2016/08/JavaScript-with-Promises.pdf
