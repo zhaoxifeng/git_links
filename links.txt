@@ -34,4 +34,4 @@ http://pepa.holla.cz/wp-content/uploads/2016/08/JavaScript-with-Promises.pdf
 
 c++ 
 promise future
-http://dist-prog-book.com/chapter/2/futures.html
+https://paoloseverini.wordpress.com/2014/04/07/concurrency-in-c11/
