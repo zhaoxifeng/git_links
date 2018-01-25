@@ -39,3 +39,8 @@ https://paoloseverini.wordpress.com/2014/04/07/concurrency-in-c11/
 ios 
 https://www.theseus.fi/bitstream/handle/10024/124255/Triet-Le-Thesis-Final-05042017.pdf?sequence=1
 https://developer.apple.com/library/content/navigation/
+
+swift gui
+https://github.com/lanqy/swift-programmatically
+https://github.com/jrkiosdev/swift-ui-programmatically
+https://makeapppie.com/2014/07/26/the-swift-swift-tutorial-how-to-use-uiviews-with-auto-layout-programmatically/
