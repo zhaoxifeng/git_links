@@ -38,3 +38,4 @@ https://paoloseverini.wordpress.com/2014/04/07/concurrency-in-c11/
 
 ios 
 https://www.theseus.fi/bitstream/handle/10024/124255/Triet-Le-Thesis-Final-05042017.pdf?sequence=1
+https://developer.apple.com/library/content/navigation/
