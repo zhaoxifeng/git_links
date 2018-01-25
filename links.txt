@@ -35,3 +35,6 @@ http://pepa.holla.cz/wp-content/uploads/2016/08/JavaScript-with-Promises.pdf
 c++ 
 promise future
 https://paoloseverini.wordpress.com/2014/04/07/concurrency-in-c11/
+
+ios 
+https://www.theseus.fi/bitstream/handle/10024/124255/Triet-Le-Thesis-Final-05042017.pdf?sequence=1
