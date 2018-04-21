@@ -40,6 +40,9 @@ ios
 https://www.theseus.fi/bitstream/handle/10024/124255/Triet-Le-Thesis-Final-05042017.pdf?sequence=1
 https://developer.apple.com/library/content/navigation/
 
+using asio:
+https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/using.html
+
 swift gui
 https://github.com/lanqy/swift-programmatically
 https://github.com/jrkiosdev/swift-ui-programmatically
