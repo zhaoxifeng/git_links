@@ -1,1 +1,4 @@
 git log --boundary --graph --pretty=format:%m %h %Cblue %an %Cred %s %Cgreen %cr origin/master...master
+
+//display the local branch and remote branch association
+git branch -vv
