@@ -5,3 +5,6 @@ git branch -vv
 
 //search project from solution file
 grep -iarlH "ModelLinkImporter_Tests" --include="*.sln"
+
+//start IDE within git
+START "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" "MBD WORKBENCH/ARCHIVE/VISUAL STUDIO SOLUTIONS/MBDWorkbench_Development.sln"
