@@ -2,3 +2,6 @@ git log --boundary --graph --pretty=format:%m %h %Cblue %an %Cred %s %Cgreen %cr
 
 //display the local branch and remote branch association
 git branch -vv
+
+//search project from solution file
+grep -iarlH "ModelLinkImporter_Tests" --include="*.sln"
